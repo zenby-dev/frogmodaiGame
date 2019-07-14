@@ -16,7 +16,9 @@ public class Description extends Component {
 		descriptions.add("You're not sure what this is.");
 	}
 	
-	public void addDescription(String desc) { //Newer definitions automatically require higher insight
+	public void addDescription(String desc) { 
+		//Newer definitions automatically require higher insight
+		//But this is only for inspections
 		descriptions.add(desc);
 	}
 	

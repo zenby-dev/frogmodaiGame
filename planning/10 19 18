@@ -1,0 +1,39 @@
+Okay I want to regress the movement/vision system back to a basic one
+And then re-add non-euclidean elements on a per-space basis
+	eg. for each portal space, if it's in your line of sight, swap to drawing the other dimension???
+	fuck oops
+	or
+	draw that world on top for each portal (prevents recursion though...)
+		or recurse until the next portal is offscreen
+The chunk-boundary and portal code should be the same
+	So an extra property added onto tiles that otherwise don't have it.
+	So I probably don't need to change the tile.neighbors property... just how it's used??
+	So I probably don't want to redraw tiles from other chunks that have already been drawn...
+		Add every drawn tile to a list, stop if you'd redraw
+Where is the old FOV code? For within a chunk.
+		
+--Okay, so what are all the pertinent files/functions for this feature?--
+CharacterMovingSystem
+	When a character tries to move out of their current chunk
+		WRONG!!!
+	Change it to trigger when they move in any direction where neighbor[dir] != -1
+	So that you create a portal by setting a dir...
+	It should probably be single property and not an array for every tile, no multi portals
+		WRONG!!! corners! hmm.
+		Disallowing moving between chunks via corners at all is not ideal.
+		Okay so the array is okay for now...
+	Okay I actually see no issues with how it works for moving between chunks
+		besides changing it to any tile with set neighbors working as a portal
+TileRenderingSystem
+	drawLocal()
+Chunk
+	linkLocal()
+	attachCorner()
+	attach()
+
+///////////////////////////////
+		
+Also, as for story, I can make it about frogs and shrimps and spirit war jesus and such
+Maybe have a map system for exploring the cosmology???
+
+Also for making maps/chunks, I could have a system of two bitmaps for color, and a text file for characters

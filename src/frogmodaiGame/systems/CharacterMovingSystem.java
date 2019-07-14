@@ -59,17 +59,19 @@ public class CharacterMovingSystem extends IteratingSystem {
 
 				//System.out.println(String.format("%d %d", targetX, targetY));
 				
+				int dir = DirectionConverter.toInt(new Position(move.dx, move.dy));
+				
 				// Failure points
 				// If it does fail, all the moves that it didn't make it to in this list will
 				// try again and again and again...
-				if (!chunk.posInChunk(targetX, targetY)) {
+				if (!chunk.posInChunk(targetX, targetY) || tile.neighbors[dir] != -1) { //Any outside or special
 					//POTENTIALLY MOVING INTO A DIFFERENT CHUNK
 					//If tile.atplayerpos.neighborInDirectionPlayerIsMoving then
 					//	move player there
 					//DONE: Player should be able to grab what tile they're on
 					//	So they can grab their neighboring tiles
-					int dir = DirectionConverter.toInt(new Position(move.dx, move.dy));
-					if (tile.neighbors[dir] == -1) return false;
+					
+					if (tile.neighbors[dir] == -1) return false; //But if neither, fail to move
 					int neighbor = tile.neighbors[dir];
 					
 					Position tilePos = mPosition.create(neighbor); //Change the ent's position to be chunk-relative

@@ -53,10 +53,12 @@ public class FFMain {
 			if (terminal instanceof AWTTerminalFrame) {
 				AWTTerminalFrame f = (AWTTerminalFrame)terminal;
 				f.setSize(screenWidth, screenHeight);
+				f.setTitle("FROGMODAI");
 			}
 			if (terminal instanceof SwingTerminalFrame) {
 				SwingTerminalFrame f = (SwingTerminalFrame)terminal;
 				f.setSize(screenWidth, screenHeight);
+				f.setTitle("FROGMODAI");
 			}
 			
 			textGUI = new MultiWindowTextGUI(screen);

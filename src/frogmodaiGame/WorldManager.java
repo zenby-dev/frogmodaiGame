@@ -85,6 +85,8 @@ public class WorldManager {
 		getChunk(chunk1).attach(getChunk(chunk2), 3, 0);
 		getChunk(chunk2).attach(getChunk(chunk1), 1, 0);
 		
+		//creatureBuilder.sphere(64+32, 16, 16, 20.0f);
+		
 		//getChunk(chunk1).attachCorner(getChunk(chunk1), 0);
 		//getChunk(chunk1).attachCorner(getChunk(chunk3), 1);
 		//getChunk(chunk1).attachCorner(getChunk(chunk3), 2);
@@ -239,6 +241,8 @@ public class WorldManager {
 		for (int i = 0; i < numGoblins; i++) {
 			creatureBuilder.goblin(chunk, r.nextInt(chunk.width), r.nextInt(chunk.height));
 		}
+		
+		// itemBuilder.createTest(chunk, 12, 6);
 	}
 
 	void generateTest() {

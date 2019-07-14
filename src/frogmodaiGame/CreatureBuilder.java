@@ -84,14 +84,14 @@ public class CreatureBuilder {
 		return ghost;
 	}
 	
-	public int sphere(int x, int y) {
+	public int sphere(int x, int y, int _radius, float _speed) {
 		int sphere = FFMain.worldManager.world.create();
 		Position pos = mPosition.create(sphere);
 		pos.x = x;
 		pos.y = y;
 		SphereInfo sphereInfo = mSphereInfo.create(sphere);
-		sphereInfo.radius = 16;
-		sphereInfo.speed = 20.0;
+		sphereInfo.radius = _radius;
+		sphereInfo.speed = _speed;
 		return sphere;
 	}
 

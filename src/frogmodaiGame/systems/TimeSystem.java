@@ -41,7 +41,7 @@ public class TimeSystem extends IteratingSystem {
 		TimedActor actor = mTimedActor.create(a);
 		while (actor.energy > 0 && !actor.isFrozen) {
 			currentActor = a;
-			int actionCost = actor.act.apply(a); 
+			int actionCost = actor.act.apply(a); // THIS WHERE ACTOR DO
 			currentActor = -1;
 			
 			if (currentActorRemoved) {
