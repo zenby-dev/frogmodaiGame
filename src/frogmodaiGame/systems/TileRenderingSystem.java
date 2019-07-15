@@ -104,6 +104,7 @@ public class TileRenderingSystem extends IteratingSystem { // This is for terrai
 					// pos.y)) {
 					//TODO: this is significantly broken
 					//RESOLUTION(?): parameter "start" was the chunk of the destination tile, not the player's chunk.
+					//if (playerChunkAddress.worldID != chunkAddress.worldID) continue;
 					if (FFMain.worldManager.LOS(playerChunk, playerPos.x, playerPos.y, pos.x, pos.y)) { //TODO: CROSSING CHUNKS IS FUCKING BROKEN
 						if (!drawEntity(screenPos, tile, character))
 							screen.setCharacter(screenPos.x, screenPos.y, character.getTextCharacter());

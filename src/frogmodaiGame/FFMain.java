@@ -1,6 +1,7 @@
 package frogmodaiGame;
 
 import java.awt.Dimension;
+import java.awt.Point;
 import java.io.IOException;
 import java.util.Random;
 
@@ -17,6 +18,7 @@ import com.googlecode.lanterna.input.KeyType;
 import com.googlecode.lanterna.screen.Screen;
 import com.googlecode.lanterna.screen.TerminalScreen;
 import com.googlecode.lanterna.terminal.DefaultTerminalFactory;
+import com.googlecode.lanterna.terminal.ExtendedTerminal;
 import com.googlecode.lanterna.terminal.Terminal;
 import com.googlecode.lanterna.terminal.swing.AWTTerminalFrame;
 import com.googlecode.lanterna.terminal.swing.SwingTerminalFrame;
@@ -26,9 +28,10 @@ public class FFMain {
 	public static WorldManager worldManager;
 	static TerminalSize terminalSize;
 	static Screen screen;
+	static Terminal terminal;
 	static WindowBasedTextGUI textGUI;
 	public static KeyStroke keystroke;
-	static int playerID = -1;
+	public static int playerID = -1;
 	public static int cameraID = -1;
 	static int loopSpeed = 10;
 	public static Random random;
@@ -42,7 +45,7 @@ public class FFMain {
 		DefaultTerminalFactory defaultTerminalFactory = new DefaultTerminalFactory();
 		try {
 			// Initiate Terminal
-			Terminal terminal = defaultTerminalFactory.createTerminalEmulator();
+			terminal = defaultTerminalFactory.createTerminalEmulator();
 			screen = new TerminalScreen(terminal);
 			screen.startScreen();
 			screen.setCursorPosition(null);
@@ -92,6 +95,10 @@ public class FFMain {
 			}
 		}
 	}
+	
+	/*Point getMousePos() {
+		return terminal
+	}*/
 
 	static void mainLoop() {
 		try {

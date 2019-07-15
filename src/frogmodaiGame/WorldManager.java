@@ -256,7 +256,7 @@ public class WorldManager {
 		int length = (int) Math.ceil(Math.sqrt((x0 - x1) * (x0 - x1) + (y0 - y1) * (y0 - y1)));
 		//System.out.println(length);
 		if (length == 0) return null;
-		int[] line = new int[(length) * 2]; // allocate extra space
+		int[] line = new int[(length) * 2 + 4]; // allocate extra space
 		//for (int i = 0; i < line.length; i++)
 		//	line[i] = -1;
 		int c = 0;
@@ -307,7 +307,7 @@ public class WorldManager {
 	public boolean LOS(Chunk start, int x0, int y0, int x1, int y1) {
 		int t = start.getTile(x0, y0);
 		int[] line = findLine(x0, y0, x1, y1);
-		if (line == null) return true;
+		if (line == null) return true; //making this false makes the player unseeable
 		//int lastX = x0;
 		//int lastY = y0;
 		//if (line.length <= 2) return true; //very short line
@@ -325,8 +325,8 @@ public class WorldManager {
 			//if (x == 0 && y == 0 && (Math.abs(d.x) > 1 || Math.abs(d.y) > 1)) return true; //passed end of the line
 			if (x == -9999 && y == -9999) {
 				//screen.setCharacter(line[i-2], line[i-1], new TextCharacter((char)((i/2)+48), TextColor.ANSI.RED, TextColor.ANSI.CYAN));
-				return true;
-			}
+				return true; //if false, there diagonal directions cannot be seen
+			}//doesn't affect tunnel issue
 			
 			
 			
@@ -342,8 +342,7 @@ public class WorldManager {
 			//if (dir == -1) System.out.println(String.format("%d,%d %d,%d", x, y, d.x, d.y));
 			if (dir == -1) return false; //TODO: why is this returning -1 ever?
 			int neighbor = oldTile.neighbors[dir];
-			if (neighbor == -1)
-				return false; //THE BLEED IN THE TUNNEL
+			if (neighbor == -1) return false; //THE BLEED IN THE TUNNEL
 			t = neighbor;
 			
 			//screen.setCharacter(x, y, new TextCharacter((char)((dir)+48), TextColor.ANSI.RED, TextColor.ANSI.CYAN));
@@ -355,6 +354,7 @@ public class WorldManager {
 			
 			
 			//if (x != x0 && x != x1 && y != y0 && y != y1) { //don't check solidity of start/end tiles
+			//if (!((x == x0 && y == y0) || (x == x1 && y == y1))) {
 			if (!((x == x0 && y == y0) || (x == x1 && y == y1))) {
 				if (newTile.solid) {
 					//screen.setCharacter(x, y, new TextCharacter('X', TextColor.ANSI.CYAN, TextColor.ANSI.RED));

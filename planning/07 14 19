@@ -1,0 +1,38 @@
+getting back into this yet again!!
+First task should probably be to archive the portal system and reimplement a solid base system
+Then portals could be explored on another branch, but other things can be focused on as well
+Chunk and TileRenderingSystem, huh...
+
+TileRenderingSystem
+	drawLocal()
+Chunk
+	linkLocal()
+	attachCorner()
+	attach()
+	floodGrab()
+WorldManager
+	LOS()
+	
+I think it's okay to have neighbors within chunks and such...
+Having a floodfill algorithm ready to go could be handy
+Also it isss kinda functional, and doesn't seem too slow as it is
+So maybe i should just state the problems more clearly and fix them
+
+Problem: can see one tile out from the edge into what should be the void when in a non-euclidean tunnel
+Related data structures and functions: the ones listed above, i would assume
+Another wording of the situation: 
+-a tile is being rendered that should not
+-a neighbor value that should be -1 is not, or at least something similar is happeing
+-it only appears along orthogonal lines from the character
+-sometimes affected by your distance from the wall
+-when i turn on wrapping for linkLocal(), the problem can't be seen, because all tiles show up
+-all the neighbors of that edge are -1...
+-if you disallow chunks outside of the active chunk from drawing, it still occassionally shows up 
+--because it is part of the chunk you are already in, because the positions are relative
+--despite neither instance actually being linked to anything vertically
+
+replace this system entirely with lines attached to chunks that serve the same purpose
+rn it's like those likes are along every single edge just to connect everything
+
+I need to add a debug mode where i can pause the current configuration of the game and move around the scene
+with a cursor
