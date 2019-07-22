@@ -26,6 +26,7 @@ public class WorldManager {
 	Screen screen;
 
 	CaveGenerator caveGenerator;
+	public MapLoader mapLoader;
 
 	ComponentMapper<Tile> mTile;
 	ComponentMapper<Char> mChar;
@@ -39,6 +40,7 @@ public class WorldManager {
 		itemBuilder = new ItemBuilder(world);
 		uiHelper = new UIHelper(world);
 		caveGenerator = new CaveGenerator(world);
+		mapLoader = new MapLoader();
 	}
 
 	void initWorld(Screen _screen) {
@@ -64,26 +66,29 @@ public class WorldManager {
 
 	public void start() {
 		int chunk1 = createChunk(12, 12);
-		int chunk2 = createChunk(12, 12);
-		int chunk3 = createChunk(36, 12);
+		int chunk2 = createChunk(4, 36);
+		int chunk3 = createChunk(36, 4);
 		setActiveChunk(chunk1);
 		// generateTest();
 		loadTestWorld(getChunk(chunk1));
 		loadTest2(getChunk(chunk2));
 		loadTest2(getChunk(chunk3));
 		
-		getChunk(chunk1).attach(getChunk(chunk2), 2, 0);
-		getChunk(chunk1).attach(getChunk(chunk3), 0, 0);
-		getChunk(chunk2).attach(getChunk(chunk1), 0, 0);
-		getChunk(chunk2).attach(getChunk(chunk3), 2, 0);
-		getChunk(chunk3).attach(getChunk(chunk2), 0, 0);
-		getChunk(chunk3).attach(getChunk(chunk1), 2, 0);
+		//getChunk(chunk1).attach(getChunk(chunk2), 2, 0);
+		getChunk(chunk1).attach(getChunk(chunk3), 0, -4);
+		//getChunk(chunk2).attach(getChunk(chunk1), 0, 0);
+		getChunk(chunk2).attach(getChunk(chunk3), 2, -(36/2-2));
+		getChunk(chunk3).attach(getChunk(chunk2), 0, 36/2-2);
+		getChunk(chunk3).attach(getChunk(chunk1), 2, 4);
 		
-		getChunk(chunk1).attach(getChunk(chunk2), 1, 0);
-		getChunk(chunk2).attach(getChunk(chunk1), 3, 0);
+		getChunk(chunk1).attach(getChunk(chunk2), 1, -4);
+		getChunk(chunk2).attach(getChunk(chunk1), 3, 4);
 		
-		getChunk(chunk1).attach(getChunk(chunk2), 3, 0);
-		getChunk(chunk2).attach(getChunk(chunk1), 1, 0);
+		getChunk(chunk1).attach(getChunk(chunk2), 3, -4);
+		getChunk(chunk2).attach(getChunk(chunk1), 1, 4);
+		
+		getChunk(chunk3).attachSingleTile(getChunk(chunk1), 1, 0, (36/2), 10);
+		getChunk(chunk1).attachSingleTile(getChunk(chunk3), 3, 0, 10, (36/2));
 		
 		//creatureBuilder.sphere(64+32, 16, 16, 20.0f);
 		
@@ -120,13 +125,21 @@ public class WorldManager {
 		// world.getSystem(ItemRenderingSystem.class).perspective = e;
 		world.getSystem(TileRenderingSystem.class).perspective = e;
 	}
+	
+	public int getRenderingPerspective() {
+		return world.getSystem(TileRenderingSystem.class).perspective;
+	}
+	
+	public void triggerTileRedraw() {
+		world.getSystem(TileRenderingSystem.class).triggerRedraw();
+	}
 
 	int createChunk() {
 		Chunk chunk = new Chunk();
 		return addChunk(chunk);
 	}
 
-	int createChunk(int w, int h) {
+	public int createChunk(int w, int h) {
 		Chunk chunk = new Chunk(w, h, screen);
 		return addChunk(chunk);
 	}

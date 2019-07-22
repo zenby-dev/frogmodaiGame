@@ -27,8 +27,8 @@ public class FFMain {
 
 	public static WorldManager worldManager;
 	static TerminalSize terminalSize;
-	static Screen screen;
-	static Terminal terminal;
+	public static Screen screen;
+	public static Terminal terminal;
 	static WindowBasedTextGUI textGUI;
 	public static KeyStroke keystroke;
 	public static int playerID = -1;
@@ -118,7 +118,7 @@ public class FFMain {
 					terminalSize = newSize;
 					HookManager.call("ScreenResized");
 				}
-
+				
 				worldManager.process();
 
 				// Redraw screen
@@ -137,5 +137,44 @@ public class FFMain {
 		}
 	}
 
+	public static int red(int c) {
+		return (c & 0xFF000000) >> 24;
+	}
 	
+	public static int green(int c) {
+		return (c & 0x00FF0000) >> 16;
+	}
+	
+	public static int blue(int c) {
+		return (c & 0x0000FF00) >> 8;
+	}
+	
+	//0 = Black
+	//1 = Red
+	//2 = Green
+	//3 = Yellow
+	//4 = Blue
+	//5 = Magenta
+	//6 = Cyan
+	//7 = White
+	//8 = Default
+	
+	public static int RGBToLanterna(int c) {
+		int r = red(c);
+		int g = green(c);
+		int b = blue(c);
+		
+		System.out.println(r + "," + g + "," + b);
+		
+		if (r == 0 && g == 0 && b == 0) return 0;
+		if (r == 255 && g == 0 && b == 0) return 1;
+		if (r == 0 && g == 255 && b == 0) return 2;
+		if (r == 255 && g == 255 && b == 0) return 3;
+		if (r == 0 && g == 0 && b == 255) return 4;
+		if (r == 255 && g == 0 && b == 255) return 5;
+		if (r == 0 && g == 255 && b == 255) return 6;
+		if (r == 255 && g == 255 && b == 255) return 7;
+		
+		return 0;
+	}
 }

@@ -45,6 +45,13 @@ public class Chunk { // SHOULD NOT CONTAIN ANY GENERATION CODE
 		neighbors = new ArrayList<Chunk>();
 		screen = _screen;
 	}
+	
+	public Chunk(int _width, int _height) {
+		width = _width;
+		height = _height;
+		tiles = new int[width * height];
+		neighbors = new ArrayList<Chunk>();
+	}
 
 	public Chunk() {
 		tiles = new int[width * height];
@@ -506,6 +513,120 @@ public class Chunk { // SHOULD NOT CONTAIN ANY GENERATION CODE
 				}
 				if (chunk.posInChunk(x-1 + alignment, 0)) {
 					int them = chunk.getTile(x-1 + alignment, 0);
+					Tile meTile = mTile.create(me);
+					Tile themTile = mTile.create(them);
+					meTile.neighbors[5] = them;
+					//themTile.neighbors[2] = me;
+				}
+			}
+		}
+		
+		return true;
+	}
+	
+	public boolean attachSingleTile(Chunk chunk, int side, int alignment, int indexA, int indexB) {
+		if (side == 0) { //left
+			//for (int y = 0; y < height; y++) {
+			int y1 = indexA;
+			int y2 = indexB; {
+				int me = getTile(0, y1);
+				if (chunk.posInChunk(chunk.width-1, y2 + alignment)) {
+					int them = chunk.getTile(chunk.width-1, y2 + alignment);
+					Tile meTile = mTile.create(me);
+					Tile themTile = mTile.create(them);
+					meTile.neighbors[3] = them;
+					//themTile.neighbors[4] = me;
+				}
+				if (chunk.posInChunk(chunk.width-1, y2+1 + alignment)) {
+					int them = chunk.getTile(chunk.width-1, y2+1 + alignment);
+					Tile meTile = mTile.create(me);
+					Tile themTile = mTile.create(them);
+					meTile.neighbors[5] = them;
+					//themTile.neighbors[2] = me;
+				}
+				if (chunk.posInChunk(chunk.width-1, y2-1 + alignment)) {
+					int them = chunk.getTile(chunk.width-1, y2-1 + alignment);
+					Tile meTile = mTile.create(me);
+					Tile themTile = mTile.create(them);
+					meTile.neighbors[0] = them;
+					//themTile.neighbors[7] = me;
+				}
+			}
+		} else if (side == 1) {//up
+			//for (int x = 0; x < width; x++) {
+			int x1 = indexA;
+			int x2 = indexB; {
+				int me = getTile(x1, 0);
+				if (chunk.posInChunk(x2 + alignment, chunk.height-1)) {
+					int them = chunk.getTile(x2 + alignment, chunk.height-1);
+					Tile meTile = mTile.create(me);
+					Tile themTile = mTile.create(them);
+					meTile.neighbors[1] = them;
+					//themTile.neighbors[6] = me;
+				}
+				if (chunk.posInChunk(x2+1 + alignment, chunk.height-1)) {
+					int them = chunk.getTile(x2+1 + alignment, chunk.height-1);
+					Tile meTile = mTile.create(me);
+					Tile themTile = mTile.create(them);
+					meTile.neighbors[2] = them;
+					//themTile.neighbors[5] = me;
+				}
+				if (chunk.posInChunk(x2-1 + alignment, chunk.height-1)) {
+					int them = chunk.getTile(x2-1 + alignment, chunk.height-1);
+					Tile meTile = mTile.create(me);
+					Tile themTile = mTile.create(them);
+					meTile.neighbors[0] = them;
+					//themTile.neighbors[7] = me;
+				}
+			}
+		} else if (side == 2) {//right
+			//for (int y = 0; y < height; y++) {
+			int y1 = indexA;
+			int y2 = indexB; {
+				int me = getTile(width-1, y1);
+				if (chunk.posInChunk(0, y2 + alignment)) {
+					int them = chunk.getTile(0, y2 + alignment);
+					Tile meTile = mTile.create(me);
+					Tile themTile = mTile.create(them);
+					meTile.neighbors[4] = them;
+					//themTile.neighbors[3] = me;
+				}
+				if (chunk.posInChunk(0, y2+1 + alignment)) {
+					int them = chunk.getTile(0, y2+1 + alignment);
+					Tile meTile = mTile.create(me);
+					Tile themTile = mTile.create(them);
+					meTile.neighbors[7] = them;
+					//themTile.neighbors[0] = me;
+				}
+				if (chunk.posInChunk(0, y2-1 + alignment)) {
+					int them = chunk.getTile(0, y2-1 + alignment);
+					Tile meTile = mTile.create(me);
+					Tile themTile = mTile.create(them);
+					meTile.neighbors[2] = them;
+					//themTile.neighbors[5] = me;
+				}
+			}
+		} else if (side == 3) {//down
+			//for (int x = 0; x < width; x++) {
+			int x1 = indexA;
+			int x2 = indexB;{
+				int me = getTile(x1, height-1);
+				if (chunk.posInChunk(x2 + alignment, 0)) {
+					int them = chunk.getTile(x2 + alignment, 0);
+					Tile meTile = mTile.create(me);
+					Tile themTile = mTile.create(them);
+					meTile.neighbors[6] = them;
+					//themTile.neighbors[1] = me;
+				}
+				if (chunk.posInChunk(x2+1 + alignment, 0)) {
+					int them = chunk.getTile(x2+1 + alignment, 0);
+					Tile meTile = mTile.create(me);
+					Tile themTile = mTile.create(them);
+					meTile.neighbors[7] = them;
+					//themTile.neighbors[0] = me;
+				}
+				if (chunk.posInChunk(x2-1 + alignment, 0)) {
+					int them = chunk.getTile(x2-1 + alignment, 0);
 					Tile meTile = mTile.create(me);
 					Tile themTile = mTile.create(them);
 					meTile.neighbors[5] = them;

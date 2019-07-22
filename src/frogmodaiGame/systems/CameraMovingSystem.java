@@ -63,6 +63,9 @@ public class CameraMovingSystem extends IteratingSystem {
 //		}
 		camPos.x += dx;
 		camPos.y += dy;
+		
+		if (dx != 0 || dy != 0)
+			FFMain.worldManager.triggerTileRedraw();
 
 	}
 

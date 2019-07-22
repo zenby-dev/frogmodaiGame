@@ -72,7 +72,7 @@ public class CharacterMovingSystem extends IteratingSystem {
 					//	So they can grab their neighboring tiles
 					
 					if (tile.neighbors[dir] == -1) return false; //But if neither, fail to move
-					int neighbor = tile.neighbors[dir];
+					int neighbor = tile.neighbors[dir]; //potential new tile to move to
 					
 					Position tilePos = mPosition.create(neighbor); //Change the ent's position to be chunk-relative
 					//We know what tile we're going to because neighbors
@@ -98,7 +98,7 @@ public class CharacterMovingSystem extends IteratingSystem {
 					camOffset.x = camPos.x - pos.x;
 					camOffset.y = camPos.y - pos.y;
 					
-					chunk.setOccupied(pos.x, pos.y, false);
+					chunk.setOccupied(pos.x, pos.y, false); //IS THIS CORRECT??? what if something else is still there?? or is that impossible
 					pos.x = tilePos.x;
 					pos.y = tilePos.y;
 					onTile.tile = neighbor;
@@ -141,6 +141,15 @@ public class CharacterMovingSystem extends IteratingSystem {
 				}
 			}
 		}
+		
+		tile.cachedLOS = false;
+		Tile newTile = mTile.create(onTile.tile);
+		newTile.cachedLOS = false;
+		
+		//Failures to move don't make it here
+		//Successful movement of not necessarily the player, but the perspective, necessitates redraw
+		if (FFMain.worldManager.getRenderingPerspective() == e)
+			FFMain.worldManager.triggerTileRedraw();
 
 		return true;
 	}

@@ -62,4 +62,12 @@ public class Char extends Component {
 			return new TextCharacter(character, TextColor.ANSI.values()[f], TextColor.ANSI.values()[b]);
 		}
 	}
+	
+	public TextCharacter getTextCharacter(boolean bo) {
+		if (bo) {
+			return new TextCharacter(character, TextColor.ANSI.values()[fgc], TextColor.ANSI.values()[bgc], SGR.BOLD);
+		} else {
+			return new TextCharacter(character, TextColor.ANSI.values()[fgc], TextColor.ANSI.values()[bgc]);
+		}
+	}
 }

@@ -36,3 +36,141 @@ rn it's like those likes are along every single edge just to connect everything
 
 I need to add a debug mode where i can pause the current configuration of the game and move around the scene
 with a cursor
+Hit button to active debug mode/detach from entity-based perspective
+Possess any entity
+If that entity doesn't have a UI defined like the player will, show default debug data UI
+
+HIERARCHICAL TASK NETWORKS
+
+Add Sensor components/system
+Add WorldState classes
+
+Primitive Task
+	operator
+	effects
+	conditions
+	
+Atomic actions
+Are accomplished in one way
+Different effects and preconditions can be paired with the same operator
+	
+example:
+DoTrunkSlam
+	effects: WsTired
+SprintToEnemy
+	operator: MoveTo
+	effects:
+		NextToEnemy
+		Tired
+WalkToNextBridge
+	operator: MoveTo
+			
+"domain" is the entire task hierarchy
+	
+CompoundTask [TaskName(term1,term2,...)]
+	Method0 [Condition1, Condition2, ...]
+		Subtasks [task1(term1,term2,...), task2(term1,term2,...)]
+	Method1 [Condition1, Condition2, ...]
+		Subtasks [task1(term1,term2,...), task2(term1,term2,...)]
+		
+CompoundTask [AttackEnemy]
+	Method0 [WsHasTreeTrunk == true]
+		Subtasks [NavigateTo(EnemyLoc), DoTrunkSlam()]
+	Method1 [WsHasTreeTrunk == false]
+		Subtasks [LiftBoulderFromGround(), ThrowBoulderAt(EnemyLoc)]
+
+CompoundTask[BeTreeThumper]
+	Method[WsCanSeeEnemy == true]
+		Subtasks[NavigateToEnemy(), DoTrunkSlam()]
+	Method[true]
+		Subtasks[ChooseBridgeToCheck(), NavigateToBridge(), CheckBridge()]
+		
+PrimitiveTask[DoTrunkSlam]
+	Operator[AnimatedAttackOperator(TrunkSlamAnimName)]
+PrimitiveTask[NavigateToEnemy]
+	Operator[NavigateToOperator(EnemyLocRef)]
+		Effects[WsLocation = EnemyLocRef]
+PrimitiveTask[ChooseBridgeToCheck]
+	Operator[ChooseBridgeToCheckOperator]
+PrimitiveTask[NavigateToBridge]
+	Operator[NavigateToOperator(NextBridgeLocRef)]
+		Effects[WsLocation = NextBridgeLocRef]
+PrimitiveTask[CheckBridge]
+	Operator[CheckBridgeOperator(SearchAnimName)]
+
+Three conditions force the planner to pick a new plan:
+1) NPC finishes or fails current plan
+2) NPC does not have a plan
+3) NPC's worldstate changes through a sensor
+
+A root compound task represents the problem domain we are trying to plan for
+Root task is pushed onto the TasksToProcess stack
+Planner creates copy of worldstate, used to simulate what will happen when tasks are executed
+
+while(TasksToProcess is not empty)
+	Pop next task off TasksToProcess
+	If compound, decompose
+		Search methods for first valid set of conditions
+		if found, push subtasks to TasksToProcess
+		if not, rollback planner state to last decomposed compound task
+	If primitive, check preconditions against working world state
+		If conditions met
+			Add task to final plan
+			Apply effects to working world state
+		If not
+			rollback planner
+This will end with either a list of primitive tasks, or no plan
+
+WorkingWS = CurrentWorldState
+TasksToProcess.Push(RootTask)
+while TasksToProcess.NotEmpty
+{
+	CurrentTask = TasksToProcess.Pop()
+	if CurrentTask.Type == CompoundTask
+	{
+		SatisfiedMethod = CurrentTask.FindSatisfiedMethod(WorkingWS)
+		if SatisfiedMethod != null {
+			RecordCompositionOfTask(CurrentTask, FinalPlan, DecompHistory)
+			TasksToProcess.InsertTop(SatisfiedMethod.SubTasks)
+		} else {
+			RestoreToLastDecomposedTask()
+		}
+	}
+	else
+	{
+		if PrimitiveConditionMet(CurrentTask) {
+			WorkingWS.ApplyEffects(CurrentTask.Effects)
+			FinalPlan.PushBack(CurrentTask)
+		} else {
+			RestoreToLastDecomposedTask()
+		}
+	}
+}
+
+
+
+How do i write a story?
+Do i need a beginning, middle, and end, and a structure of rising actions, climax, and falling action?
+Or could it be a nomadic movement between plateus of intensity?
+Many little stories that are all somewhat connected?
+
+7/16/19
+I need to be add some sort of "redraw needed" flag for drawing what the character can see.
+Terrain shouldn't be redrawn unless the player moves, it changes, or it is animated.
+
+7/17/19
+Should i bother making an in-engine map editor? probably
+YES I NEED TO, FUCK
+Need to create an independent worldstate and all that
+Different keypresses, maybe a different whole project????
+Need to move some code off to just a library to use in both??
+
+editor controls:
+hold some button to open glyph menu, then arrow keys to select
+two sets of buttons for cycling fore/background colors
+
+
+
+
+
+

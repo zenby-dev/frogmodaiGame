@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import com.artemis.Component;
 import com.artemis.annotations.EntityId;
+import com.googlecode.lanterna.TextCharacter;
 
 public class Tile extends Component {
 	public byte type;
@@ -13,6 +14,7 @@ public class Tile extends Component {
 	public boolean seen = false;
 	@EntityId public ArrayList<Integer> entitiesHere;
 	@EntityId public int[] neighbors;
+	public boolean cachedLOS = false;
 	//This field is going to be really important
 	//Entities shouldn't be stored at positions, they should be stored based on what Tile they're on
 	//Maybe.. if possible... we'll see

@@ -29,14 +29,19 @@ public class TileRenderingSystem extends IteratingSystem { // This is for terrai
 	Screen screen;
 	@EntityId
 	public int perspective = -1;
+	boolean fullRedraw = false;
 
 	public TileRenderingSystem(Screen _screen) { // Matches camera, not tiles, for performance
 		super(Aspect.all(Position.class, CameraWindow.class));
 		screen = _screen;
 	}
+	
+	public void triggerRedraw() {
+		fullRedraw = true;
+	}
 
 	@Override
-	protected void process(int e) {
+	protected void process(int e) { //this happens with high frequency
 		Position camPos = mPosition.create(e);
 		CameraWindow camWindow = mCameraWindow.create(e);
 		if (camWindow.focus == -1)
@@ -62,12 +67,15 @@ public class TileRenderingSystem extends IteratingSystem { // This is for terrai
 		// TODO: By the palyer's hanging inTile reference, check if they've moved out of
 		// the active chunk, if so, SWTICH active chunk
 		
-		screen.clear();
+		//if (fullRedraw) {
+			screen.clear();
 
-		memoryDraw(camPos, camWindow);
-		if (perspective != -1) {
+			memoryDraw(camPos, camWindow);
 			drawLocal(vision, camPos, camWindow);
-		}
+		//	fullRedraw = false;
+		//}
+			
+		//FFMain.worldManager.mapLoader.drawMap();
 
 	}
 
@@ -84,6 +92,8 @@ public class TileRenderingSystem extends IteratingSystem { // This is for terrai
 			ChunkAddress chunkAddress = mChunkAddress.create(t);
 			Chunk chunk = FFMain.worldManager.getChunk(chunkAddress.worldID);
 			Tile tile = mTile.create(t);
+			
+			//if (fullRedraw) tile.cachedLOS = false;
 
 			// if (chunkAddress.worldID == FFMain.worldManager.activeChunk) {
 			Position screenPos = new Position();
@@ -106,15 +116,18 @@ public class TileRenderingSystem extends IteratingSystem { // This is for terrai
 					//RESOLUTION(?): parameter "start" was the chunk of the destination tile, not the player's chunk.
 					//if (playerChunkAddress.worldID != chunkAddress.worldID) continue;
 					if (FFMain.worldManager.LOS(playerChunk, playerPos.x, playerPos.y, pos.x, pos.y)) { //TODO: CROSSING CHUNKS IS FUCKING BROKEN
-						if (!drawEntity(screenPos, tile, character))
+						if (!drawEntity(screenPos, tile, character)) {
 							screen.setCharacter(screenPos.x, screenPos.y, character.getTextCharacter());
+						}
 						tile.seen = true;
+						//tile.cachedLOS = true;
 					}
 					// } //Don't draw anything not in your line of sight
 				}
 			}
 			// }
 		}
+		fullRedraw = false;
 	}
 
 	// @Override
