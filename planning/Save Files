@@ -1,0 +1,5 @@
+Things that should be saved:
+-World-State/Story flags (eg. which key events have happened?)
+-Entities as a whole? (made up of components, so easy to serialize?)
+-Generated maps?
+-A local list of IDs (so that item/entity IDs dont get messed up from changes to the list (is there a list?))

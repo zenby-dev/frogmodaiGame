@@ -1,6 +1,7 @@
 package frogmodaiGame;
 
 import java.awt.Dimension;
+import java.awt.FontMetrics;
 import java.awt.Point;
 import java.io.IOException;
 import java.util.Random;
@@ -20,13 +21,14 @@ import com.googlecode.lanterna.screen.TerminalScreen;
 import com.googlecode.lanterna.terminal.DefaultTerminalFactory;
 import com.googlecode.lanterna.terminal.ExtendedTerminal;
 import com.googlecode.lanterna.terminal.Terminal;
+import com.googlecode.lanterna.terminal.swing.AWTTerminal;
 import com.googlecode.lanterna.terminal.swing.AWTTerminalFrame;
 import com.googlecode.lanterna.terminal.swing.SwingTerminalFrame;
 
 public class FFMain {
 
 	public static WorldManager worldManager;
-	static TerminalSize terminalSize;
+	public static TerminalSize terminalSize;
 	public static Screen screen;
 	public static Terminal terminal;
 	static WindowBasedTextGUI textGUI;
@@ -35,6 +37,8 @@ public class FFMain {
 	public static int cameraID = -1;
 	static int loopSpeed = 10;
 	public static Random random;
+	public static int screenWidth = 64*2;
+	public static int screenHeight = 32;
 	//static final FFCommandFactory commandFactory = FFCommandFactory.init();
 
 	public static void main(String[] _args) throws IOException {
@@ -50,17 +54,20 @@ public class FFMain {
 			screen.startScreen();
 			screen.setCursorPosition(null);
 			
-			int screenWidth = 1040;
-			int screenHeight = 540;
-			
 			if (terminal instanceof AWTTerminalFrame) {
 				AWTTerminalFrame f = (AWTTerminalFrame)terminal;
-				f.setSize(screenWidth, screenHeight);
+				FontMetrics m = f.getFontMetrics(f.getFont());
+				int windowWidth = screenWidth*m.charWidth(' ')*2;	 //1040;
+				int windowHeight = (screenHeight+2)*m.getHeight(); //540
+				f.setSize(windowWidth, windowHeight);
 				f.setTitle("FROGMODAI");
 			}
 			if (terminal instanceof SwingTerminalFrame) {
 				SwingTerminalFrame f = (SwingTerminalFrame)terminal;
-				f.setSize(screenWidth, screenHeight);
+				FontMetrics m = f.getFontMetrics(f.getFont());
+				int windowWidth = screenWidth*m.charWidth(' ')*2;	 //1040;
+				int windowHeight = (screenHeight+2)*m.getHeight(); //540
+				f.setSize(windowWidth, windowHeight);
 				f.setTitle("FROGMODAI");
 			}
 			

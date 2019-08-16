@@ -1,0 +1,46 @@
+How do we include animations that pause game time?
+How do we process without advancing game time?
+
+***TODO:***
+-Window view into level that centers (lazily/near boundary) on player
+-UI that is proportional to the terminalSize
+-Chunk transitions (un/loading)
+-Save ticks since player lasted visited a chunk
+-Fog of War (unseen areas) with FOV
+
+When it's an entity's turn, that's not a little part of the set of processes
+It's a multi-loop state
+Only monsters in the player's FOV should be visible
+
+
+Entities create lists of actions using energy points
+All action attempts use energy points regardless of success
+These lists are passed to systems through the VirtualControllers
+Systems skim and remove relevant types of commands
+	Systems take all of each type from the queue
+If an earlier system takes a type, it will not be left for a later system (likely won't be an issue, no ambiguous commands)
+
+Under the above system, the moving system should process all moves of a given character at the same time
+After all, they selected their moves within their turn, they execute within their turn
+Or not, because it processes V system V entity, not V entity V systems (where V is "for all")
+That means in a given turn,
+In order, all entities do all moves
+In order, all entities do all attacks
+Or should only one action per system be done per entity per tick?
+
+Per entity, actions are processed strictly in order, processing at most one Command per main loop.
+
+In ADOM I can move up to be adjacent to a kobold, and it can attack me in the same time-skip.
+This could only happen if the attack was issued after my move happened.
+Also, usually you don't see monsters teleporting around at lightning speed.
+I infer from this that movement should take up a majority of your energy points.
+
+I should not be skipping spots aka doing two moves from one key press just because i had enough energy
+
+Creatures can end up doing 6 actions in a row without interruption
+And it's okay if all those commands take a whole frame to process...
+
+[Side note: you could make this a party-based roguelike, somewhere between dwarf fortress, oregon trail/DRTC, and an RTS
+Except it's just like a roguelike but where the UI switches when you switch between your characters
+Then you could base the characters more in AI and have them follow the players commands loosely
+But that can wait for later]

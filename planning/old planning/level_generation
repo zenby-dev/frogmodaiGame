@@ -1,0 +1,10 @@
+LEVEL GENERATION
+
+Different functions for "marking" tiles with flags, which are then checked to determine final tile type/contents
+eg. Function that marks tiles based on a threshold on perlin noise
+	and another that marks any tiles surrounding tile with a specific flag
+	Can use components and systems for tags and functions of tags and neighbors
+
+Big open circular rooms with pillars and fountains
+Corridors and tunnels leading to rooms that break out into great chasms
+Real scenic ascii shit

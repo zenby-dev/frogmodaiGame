@@ -165,9 +165,30 @@ Need to create an independent worldstate and all that
 Different keypresses, maybe a different whole project????
 Need to move some code off to just a library to use in both??
 
-editor controls:
+CHUNK editor controls:
 hold some button to open glyph menu, then arrow keys to select
 two sets of buttons for cycling fore/background colors
+
+7/25/19
+Editors needed:
+-Chunk Editor
+-Animated Tile Editor
+-Monster Prefab editor?????
+
+Write a state system
+-Intro State
+-Main Menu State/s
+-Game State
+-Editor State/s
+
+How should the message system work?
+A class that collects and interprets events?
+Then constructs strings appropriately and displays them?
+Should events have a formatter built in?
+Should that formatter be an intermediate, ie. instead of a string, a grammar tree of the parts of speech?
+
+
+
 
 
 

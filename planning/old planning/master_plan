@@ -1,0 +1,51 @@
+MASTER PLAN
+
+THE GREAT BIG TODO-LIST: (as of 12/29/17)
+[]Items
+	[x]Basic existence
+	[x]Pickup
+	[x]Drop
+	[]Consume
+	[]Wear/Wield
+	[]Put in container
+	[]Use as container
+[]Character stats/traits/skills
+[]Map/Chunk features
+	[]seeing neighbor chunks
+	[]moving player between chunks
+		[]NEED to unload all neighboring chunks from old chunk (except those shared with the new active chunk)
+			[]NEED to be able to serialize all components
+			Should it be necessary to save anything other than serialized components?
+			Ideally all info that needs to persist should just be components
+			FFMain.playerID and all that shit should be fresh each time
+			Going to have to rewrite a few things to fit the Reference/Renderable/Resolver model
+			[]Identify components/systems to update with RRR-model
+			[x]Add @EntityId where necessary
+		[]REALLY SHOULD to refresh all stored entity ID's and entities and shit!!
+[]Map/dungeon generation
+[]Combat
+[]AI
+	[]Pathfinding
+		[]Djikstra Maps
+		[]A*
+		[]Custom
+	[]Need/Goal-Driven
+[]Extra Shit
+	[]GloboCorp logo + animation as an action/event that can happen during the game
+	[]Image-to-ASCII/(those ascii tiles that are for shading)
+	[]Have a globe spinning super fast so it looks like an energy ball down in a reactor room or some such
+	[](VISION SYSTEM)Enemies remain invisible until succesful spot check
+
+What will the game be like when this list is done?
+Start in a city, there are buildings and street around you
+You can go into an office and encounter NPCs and enemies
+You can raid break rooms and get schwag
+
+****** DAY-TO-DAY LOG: ******
+12/28/17: We must next add djistkstra maps or whatever
+And basic AI
+
+12/29/17: I want most of the UI to be handled as Text-GUI forms!!! It's FORMS and Faxmachines, after all.
+How do I pause to open a menu?
+OH the lock in the action system
+No one will do any actions as long as that's locked but systems can still process!

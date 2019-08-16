@@ -65,7 +65,7 @@ public class WorldManager {
 	}
 
 	public void start() {
-		int chunk1 = createChunk(12, 12);
+		int chunk1 = createChunk(12*8, 12*8);
 		int chunk2 = createChunk(4, 36);
 		int chunk3 = createChunk(36, 4);
 		setActiveChunk(chunk1);

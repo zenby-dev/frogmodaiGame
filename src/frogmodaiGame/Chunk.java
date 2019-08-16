@@ -647,12 +647,12 @@ public class Chunk { // SHOULD NOT CONTAIN ANY GENERATION CODE
 	}
 
 	//SHIT DAWG SERIALIZATION HERE
-	public void unload() {
-		System.out.println("TODO: Chunk.unload");
+	public void unload() { //TODO: Called every move?????
+		//System.out.println("TODO: Chunk.unload");
 	}
 
 	public void load() {
-		System.out.println("TODO: Chunk.load");
+		//System.out.println("TODO: Chunk.load");
 	}
 }
 

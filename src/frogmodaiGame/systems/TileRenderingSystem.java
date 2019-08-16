@@ -8,9 +8,13 @@ import com.artemis.ComponentMapper;
 import com.artemis.World;
 import com.artemis.annotations.EntityId;
 import com.artemis.systems.IteratingSystem;
+import com.googlecode.lanterna.TerminalPosition;
+import com.googlecode.lanterna.TerminalSize;
 import com.googlecode.lanterna.TextCharacter;
 import com.googlecode.lanterna.TextColor;
+import com.googlecode.lanterna.graphics.TextImage;
 import com.googlecode.lanterna.screen.Screen;
+import com.googlecode.lanterna.screen.ScreenBuffer;
 
 import frogmodaiGame.Chunk;
 import frogmodaiGame.FFMain;
@@ -30,10 +34,16 @@ public class TileRenderingSystem extends IteratingSystem { // This is for terrai
 	@EntityId
 	public int perspective = -1;
 	boolean fullRedraw = false;
+	TextCharacter emptyCharacter;
+	
+	ScreenBuffer buffer;
 
 	public TileRenderingSystem(Screen _screen) { // Matches camera, not tiles, for performance
 		super(Aspect.all(Position.class, CameraWindow.class));
 		screen = _screen;
+		System.out.printf("%d, %d\n", FFMain.screenWidth/2, FFMain.screenHeight);
+		buffer = new ScreenBuffer(new TerminalSize(FFMain.screenWidth/2, FFMain.screenHeight), new TextCharacter(' ', TextColor.ANSI.BLACK, TextColor.ANSI.BLACK));
+		emptyCharacter = new TextCharacter(' ', TextColor.ANSI.BLACK, TextColor.ANSI.BLACK);
 	}
 	
 	public void triggerRedraw() {
@@ -67,16 +77,22 @@ public class TileRenderingSystem extends IteratingSystem { // This is for terrai
 		// TODO: By the palyer's hanging inTile reference, check if they've moved out of
 		// the active chunk, if so, SWTICH active chunk
 		
-		//if (fullRedraw) {
-			screen.clear();
+		if (fullRedraw) {
+			clearBuffer();
 
 			memoryDraw(camPos, camWindow);
 			drawLocal(vision, camPos, camWindow);
-		//	fullRedraw = false;
-		//}
+			fullRedraw = false;
+		}
+		
+		screen.newTextGraphics().drawImage(new TerminalPosition(0, 0), buffer);
 			
 		//FFMain.worldManager.mapLoader.drawMap();
 
+	}
+	
+	private void clearBuffer() {
+		buffer.newTextGraphics().drawRectangle(new TerminalPosition(0, 0), buffer.getSize(), emptyCharacter);
 	}
 
 	private void drawLocal(ArrayList<RelativePosition> vision, Position camPos, CameraWindow camWindow) {
@@ -103,7 +119,7 @@ public class TileRenderingSystem extends IteratingSystem { // This is for terrai
 					&& screenPos.y < camWindow.height) { // If this tile is on screen
 				if (perspective == -1) {
 					if (!drawEntity(screenPos, tile, character))
-						screen.setCharacter(screenPos.x, screenPos.y, character.getTextCharacter());
+						buffer.setCharacterAt(screenPos.x, screenPos.y, character.getTextCharacter());
 				} else {
 					Position playerPos = mPosition.create(perspective);
 					Sight sight = mSight.create(perspective);
@@ -117,7 +133,7 @@ public class TileRenderingSystem extends IteratingSystem { // This is for terrai
 					//if (playerChunkAddress.worldID != chunkAddress.worldID) continue;
 					if (FFMain.worldManager.LOS(playerChunk, playerPos.x, playerPos.y, pos.x, pos.y)) { //TODO: CROSSING CHUNKS IS FUCKING BROKEN
 						if (!drawEntity(screenPos, tile, character)) {
-							screen.setCharacter(screenPos.x, screenPos.y, character.getTextCharacter());
+							buffer.setCharacterAt(screenPos.x, screenPos.y, character.getTextCharacter());
 						}
 						tile.seen = true;
 						//tile.cachedLOS = true;
@@ -143,7 +159,7 @@ public class TileRenderingSystem extends IteratingSystem { // This is for terrai
 				Chunk chunk = FFMain.worldManager.getActiveChunk();
 				int i = tx + ty * chunk.width;
 				if (tx < 0 || ty < 0 || tx >= chunk.width || ty >= chunk.height) {
-					screen.setCharacter(x, y, new TextCharacter(' ', TextColor.ANSI.BLACK, TextColor.ANSI.BLACK));
+					buffer.setCharacterAt(x, y, emptyCharacter);
 					continue;
 				}
 				int t = chunk.tiles[i];
@@ -168,12 +184,12 @@ public class TileRenderingSystem extends IteratingSystem { // This is for terrai
 							&& screenPos.y < camWindow.height) {
 						if (perspective == -1) { // If no perspective, draw everything as-is
 							if (!drawEntity(screenPos, tile, character))
-								screen.setCharacter(screenPos.x, screenPos.y, character.getTextCharacter());
+								buffer.setCharacterAt(screenPos.x, screenPos.y, character.getTextCharacter());
 						} else {
 							if (tile.seen) { // Draw memory
-								screen.setCharacter(screenPos.x, screenPos.y, character.getTextCharacter(8, 0, false));
+								buffer.setCharacterAt(screenPos.x, screenPos.y, character.getTextCharacter(8, 0, false));
 							} else { // Black out unknown areas
-								screen.setCharacter(screenPos.x, screenPos.y, character.getTextCharacter(0, 0, false));
+								buffer.setCharacterAt(screenPos.x, screenPos.y, character.getTextCharacter(0, 0, false));
 							}
 						}
 					}
@@ -206,7 +222,7 @@ public class TileRenderingSystem extends IteratingSystem { // This is for terrai
 			return false;
 
 		TextCharacter ct = mChar.get(winner).getTextCharacter();
-		screen.setCharacter(pos.x, pos.y, ct.withBackgroundColor(TextColor.ANSI.values()[tileChar.bgc]));
+		buffer.setCharacterAt(pos.x, pos.y, ct.withBackgroundColor(TextColor.ANSI.values()[tileChar.bgc]));
 
 		return true;
 	}

@@ -108,8 +108,8 @@ public class CharacterMovingSystem extends IteratingSystem {
 						FFMain.worldManager.shiftChunks(newChunk);
 						int nx = pos.x + camOffset.x - move.dx;
 						int ny = pos.y + camOffset.y - move.dy;
-						nx %= camWindow.width;
-						ny %= camWindow.height;
+						//nx %= camWindow.width;
+						//ny %= camWindow.height;
 //						if (nx < 0)
 //							nx += camWindow.width;
 //						if (ny < 0)
