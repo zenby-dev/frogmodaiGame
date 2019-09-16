@@ -24,7 +24,7 @@ public class WorldManager {
 	ItemBuilder itemBuilder;
 	public UIHelper uiHelper;
 	public int activeChunk = -1;
-	TileRenderingSystem tileRender;
+	//TileRenderingSystem tileRender;
 	Screen screen;
 
 	CaveGenerator caveGenerator;
@@ -64,6 +64,11 @@ public class WorldManager {
 		world = new World(config);
 		world.inject(this);
 		screen = _screen;
+	}
+	
+	public boolean refreshNeeded() {
+		if (world.getSystem(TileRenderingSystem.class).drewThisFrame) return true;
+		return false;
 	}
 
 	public void start() {
@@ -126,14 +131,20 @@ public class WorldManager {
 	void setRenderingPerspective(int e) {
 		// world.getSystem(CharacterRenderingSystem.class).perspective = e;
 		// world.getSystem(ItemRenderingSystem.class).perspective = e;
+		if (world.getSystem(TileRenderingSystem.class)==null) return;
+		
 		world.getSystem(TileRenderingSystem.class).perspective = e;
 	}
 	
 	public int getRenderingPerspective() {
+		if (world.getSystem(TileRenderingSystem.class)==null) return -1;
+		
 		return world.getSystem(TileRenderingSystem.class).perspective;
 	}
 	
 	public void triggerTileRedraw() {
+		if (world.getSystem(TileRenderingSystem.class)==null) return;
+		
 		world.getSystem(TileRenderingSystem.class).triggerRedraw();
 	}
 

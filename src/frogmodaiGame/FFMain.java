@@ -110,6 +110,9 @@ public class FFMain {
 	static void mainLoop() {
 		try {
 			while (true) { // Main Loop
+				
+				long cycleStart = System.currentTimeMillis();
+				
 				// Handle Input
 				keystroke = screen.pollInput();
 				if (keystroke != null
@@ -129,9 +132,14 @@ public class FFMain {
 				worldManager.process();
 
 				// Redraw screen
-				screen.refresh();
+				if (worldManager.refreshNeeded())
+					screen.refresh();
 				
 				keystroke = null;
+				
+				long cycleEnd = System.currentTimeMillis();
+				long cycleLength = cycleEnd - cycleStart;
+				System.out.println(cycleLength);
 				
 				try {
 					Thread.sleep(loopSpeed);

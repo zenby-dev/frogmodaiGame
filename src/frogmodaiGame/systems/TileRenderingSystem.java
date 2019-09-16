@@ -39,6 +39,8 @@ public class TileRenderingSystem extends IteratingSystem { // This is for terrai
 	TextCharacter emptyCharacter;
 	double PI = 3.14159265;
 	
+	public boolean drewThisFrame = false;
+	
 	ScreenBuffer buffer;
 
 	public TileRenderingSystem(Screen _screen) { // Matches camera, not tiles, for performance
@@ -55,6 +57,7 @@ public class TileRenderingSystem extends IteratingSystem { // This is for terrai
 
 	@Override
 	protected void process(int e) { //this happens with high frequency
+		drewThisFrame = false;
 		Position camPos = mPosition.create(e);
 		CameraWindow camWindow = mCameraWindow.create(e);
 		if (camWindow.focus == -1)
@@ -84,8 +87,10 @@ public class TileRenderingSystem extends IteratingSystem { // This is for terrai
 			clearBuffer();
 
 			memoryDraw(camPos, camWindow);
-			drawLocal(vision, sight.distance, camPos, camWindow);
+			//drawLocal(vision, sight.distance, camPos, camWindow);
+			olddrawLocal(vision, camPos, camWindow);
 			fullRedraw = false;
+			drewThisFrame = true;
 		}
 		
 		TextGraphics tg = screen.newTextGraphics();
@@ -169,7 +174,7 @@ public class TileRenderingSystem extends IteratingSystem { // This is for terrai
 		}
 	}
 
-	private void olddrawLocal(ArrayList<RelativePosition> vision, Position camPos, CameraWindow camWindow) {
+	private void olddrawLocal(HashMap<String, RelativePosition> vision, Position camPos, CameraWindow camWindow) {
 		//Right now this just goes through ALL the tiles grabbed a relative process
 		//So no more relativeness SHOULD NEED TO BE DONE!!!
 		//Instead, we should do a traditional LOS kinda
@@ -178,7 +183,7 @@ public class TileRenderingSystem extends IteratingSystem { // This is for terrai
 		//and it should draw every character along the way, from center out
 		//to avoid retracing rays.
 		//Do findLine, 
-		for (RelativePosition rel : vision) {
+		for (RelativePosition rel : vision.values()) {
 			int t = rel.e;
 			Position pos = new Position();
 			pos.x = rel.x;
