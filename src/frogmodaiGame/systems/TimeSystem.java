@@ -17,7 +17,7 @@ public class TimeSystem extends IteratingSystem {
 	
 	int ticks = 0;
 	
-	LinkedList<Integer> queue;
+	public LinkedList<Integer> queue;
 	int currentActor = -1;
 	boolean currentActorRemoved = false;
 	int lockCount = 0;

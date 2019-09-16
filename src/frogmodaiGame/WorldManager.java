@@ -57,6 +57,7 @@ public class WorldManager {
 						new PickupSystem(),
 						new DropSystem(), 
 						new ItemRelocatingSystem(), 
+						new DescriptiveTextSystem(_screen),
 						new TileRenderingSystem(_screen),
 						new PositionGhostSystem(_screen), 
 						new SphereRenderingSystem(_screen))
@@ -67,7 +68,9 @@ public class WorldManager {
 	}
 	
 	public boolean refreshNeeded() {
-		if (world.getSystem(TileRenderingSystem.class).drewThisFrame) return true;
+		if (		world.getSystem(TileRenderingSystem.class).drewThisFrame ||
+				world.getSystem(DescriptiveTextSystem.class).drewThisFrame)
+			return true;
 		return false;
 	}
 
@@ -211,7 +214,8 @@ public class WorldManager {
 		}
 	}
 
-	void process() {
+	void process() { 
+		//OOPS! the order this queue goes in isn't the order that entities are processed by the ECS!!!!
 		getActiveChunk().update();
 		TimeSystem timeSystem = world.getSystem(TimeSystem.class);
 		int actorsPerUpdate = timeSystem.getNumActors();

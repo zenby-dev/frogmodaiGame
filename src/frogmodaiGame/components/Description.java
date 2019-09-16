@@ -27,7 +27,7 @@ public class Description extends Component {
 	}
 	
 	public String getDescription(int ins) {
-		int _insight = 0;
+		int _insight = ins;
 		int insight = Math.min(_insight, descriptions.size());
 		return descriptions.get(insight);
 	}

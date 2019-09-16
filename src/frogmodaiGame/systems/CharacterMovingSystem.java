@@ -1,7 +1,10 @@
 package frogmodaiGame.systems;
 
+import java.util.LinkedList;
+
 import com.artemis.Aspect;
 import com.artemis.Aspect.Builder;
+import com.artemis.BaseEntitySystem;
 import com.artemis.ComponentMapper;
 import com.artemis.EntitySystemTest.C;
 import com.artemis.systems.IteratingSystem;
@@ -10,7 +13,7 @@ import frogmodaiGame.*;
 import frogmodaiGame.commands.*;
 import frogmodaiGame.components.*;
 
-public class CharacterMovingSystem extends IteratingSystem {
+public class CharacterMovingSystem extends BaseEntitySystem {
 	ComponentMapper<Position> mPosition;
 	ComponentMapper<Mobile> mMobile;
 	ComponentMapper<VirtualController> mVirtualController;
@@ -19,6 +22,7 @@ public class CharacterMovingSystem extends IteratingSystem {
 	ComponentMapper<Tile> mTile;
 	ComponentMapper<IsPlayer> mIsPlayer;
 	ComponentMapper<OnTouch> mOnTouch;
+	ComponentMapper<OnTouched> mOnTouched;
 	ComponentMapper<CameraWindow> mCameraWindow;
 	//TODO: set player OnTile
 
@@ -157,10 +161,19 @@ public class CharacterMovingSystem extends IteratingSystem {
 	private void collisionEvent(int e, int neighbor) {
 		OnTouch onTouch = mOnTouch.create(e);
 		onTouch.act.accept(e, neighbor);
+		
+		Tile tile = mTile.create(neighbor);
+		if (tile.entitiesHere.size() > 0) {
+			for (int o : tile.entitiesHere) {
+				if (mOnTouched.has(o)) {
+					OnTouched onTouched = mOnTouched.create(o);
+					onTouched.act.accept(o, e);
+				}
+			}
+		}
 	}
 
-	@Override
-	protected void process(int e) {
+	private void process(int e) {
 		Position pos = mPosition.create(e);
 		int x = pos.x;
 		int y = pos.y;
@@ -182,6 +195,15 @@ public class CharacterMovingSystem extends IteratingSystem {
 		 * 
 		 * chunk.setOccupied(pos.x, pos.y, true); }
 		 */
+	}
+
+	@Override
+	protected void processSystem() {
+		// TODO Auto-generated method stub
+		LinkedList<Integer> entities = FFMain.worldManager.world.getSystem(TimeSystem.class).queue;
+		for (Integer e : entities) {
+			process(e);
+		}
 	}
 
 }

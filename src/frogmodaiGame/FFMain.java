@@ -25,6 +25,8 @@ import com.googlecode.lanterna.terminal.swing.AWTTerminal;
 import com.googlecode.lanterna.terminal.swing.AWTTerminalFrame;
 import com.googlecode.lanterna.terminal.swing.SwingTerminalFrame;
 
+import frogmodaiGame.systems.DescriptiveTextSystem;
+
 public class FFMain {
 
 	public static WorldManager worldManager;
@@ -106,6 +108,16 @@ public class FFMain {
 	/*Point getMousePos() {
 		return terminal
 	}*/
+	
+	public static void redraw() {
+		if (worldManager.refreshNeeded())
+			try {
+				screen.refresh();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+	}
 
 	static void mainLoop() {
 		try {
@@ -132,14 +144,13 @@ public class FFMain {
 				worldManager.process();
 
 				// Redraw screen
-				if (worldManager.refreshNeeded())
-					screen.refresh();
+				redraw();
 				
 				keystroke = null;
 				
 				long cycleEnd = System.currentTimeMillis();
 				long cycleLength = cycleEnd - cycleStart;
-				System.out.println(cycleLength);
+				//System.out.println(cycleLength);
 				
 				try {
 					Thread.sleep(loopSpeed);
@@ -150,6 +161,23 @@ public class FFMain {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+	}
+	
+	//DOING THIS FOR EASE OF PROGRAMMING BULLSHIT
+	public static void sendMessage(Paragraph p) {
+		worldManager.world.getSystem(DescriptiveTextSystem.class).addParagraph(p);
+	}
+	
+	public static void sendMessage(TextSegment t) {
+		Paragraph para = new Paragraph();
+		para.add(t);
+		worldManager.world.getSystem(DescriptiveTextSystem.class).addParagraph(para);
+	}
+	
+	public static void sendMessage(String s) {
+		Paragraph para = new Paragraph();
+		para.add(s);
+		worldManager.world.getSystem(DescriptiveTextSystem.class).addParagraph(para);
 	}
 
 	public static int red(int c) {

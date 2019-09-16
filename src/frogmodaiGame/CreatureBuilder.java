@@ -21,6 +21,7 @@ public class CreatureBuilder {
 	ComponentMapper<IsPositionGhost> mIsPositionGhost;
 	ComponentMapper<SphereInfo> mSphereInfo;
 	ComponentMapper<OnTouch> mOnTouch;
+	ComponentMapper<OnTouched> mOnTouched;
 
 	CreatureBuilder(World world) {
 		world.inject(this);
@@ -122,6 +123,10 @@ public class CreatureBuilder {
 		OnTouch onTouch = mOnTouch.create(gob);
 		onTouch.act = TouchBehaviors.GoblinTouch.act;
 		FFMain.worldManager.world.inject(onTouch.act);
+		
+		OnTouched onTouched = mOnTouched.create(gob);
+		onTouched.act = TouchedBehaviors.GoblinTouched.act;
+		FFMain.worldManager.world.inject(onTouched.act);
 		
 		return gob;
 	}
