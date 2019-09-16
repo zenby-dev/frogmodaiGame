@@ -1,6 +1,7 @@
 package frogmodaiGame.systems;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import com.artemis.Aspect;
 import com.artemis.Component;
@@ -12,6 +13,7 @@ import com.googlecode.lanterna.TerminalPosition;
 import com.googlecode.lanterna.TerminalSize;
 import com.googlecode.lanterna.TextCharacter;
 import com.googlecode.lanterna.TextColor;
+import com.googlecode.lanterna.graphics.TextGraphics;
 import com.googlecode.lanterna.graphics.TextImage;
 import com.googlecode.lanterna.screen.Screen;
 import com.googlecode.lanterna.screen.ScreenBuffer;
@@ -35,6 +37,7 @@ public class TileRenderingSystem extends IteratingSystem { // This is for terrai
 	public int perspective = -1;
 	boolean fullRedraw = false;
 	TextCharacter emptyCharacter;
+	double PI = 3.14159265;
 	
 	ScreenBuffer buffer;
 
@@ -43,7 +46,7 @@ public class TileRenderingSystem extends IteratingSystem { // This is for terrai
 		screen = _screen;
 		System.out.printf("%d, %d\n", FFMain.screenWidth/2, FFMain.screenHeight);
 		buffer = new ScreenBuffer(new TerminalSize(FFMain.screenWidth/2, FFMain.screenHeight), new TextCharacter(' ', TextColor.ANSI.BLACK, TextColor.ANSI.BLACK));
-		emptyCharacter = new TextCharacter(' ', TextColor.ANSI.BLACK, TextColor.ANSI.BLACK);
+		emptyCharacter = new TextCharacter('X', TextColor.ANSI.YELLOW, TextColor.ANSI.BLUE);
 	}
 	
 	public void triggerRedraw() {
@@ -60,7 +63,7 @@ public class TileRenderingSystem extends IteratingSystem { // This is for terrai
 		Chunk chunk = FFMain.worldManager.getActiveChunk(); //getActiveChunk() sometimes returns a chunk the player is not in
 		Sight sight = mSight.create(perspective);
 
-		ArrayList<RelativePosition> vision = new ArrayList<RelativePosition>();
+		HashMap<String, RelativePosition> vision = new HashMap<String, RelativePosition>();
 		RelativePosition start = new RelativePosition();
 		start.x = focusPos.x;
 		start.y = focusPos.y;
@@ -81,21 +84,100 @@ public class TileRenderingSystem extends IteratingSystem { // This is for terrai
 			clearBuffer();
 
 			memoryDraw(camPos, camWindow);
-			drawLocal(vision, camPos, camWindow);
+			drawLocal(vision, sight.distance, camPos, camWindow);
 			fullRedraw = false;
 		}
 		
-		screen.newTextGraphics().drawImage(new TerminalPosition(0, 0), buffer);
+		TextGraphics tg = screen.newTextGraphics();
+		tg.fillRectangle(new TerminalPosition(0,0), 
+				new TerminalSize(FFMain.screenWidth/2, FFMain.screenHeight), emptyCharacter);
+		tg.drawImage(new TerminalPosition(0, 0), buffer);
 			
 		//FFMain.worldManager.mapLoader.drawMap();
 
 	}
 	
 	private void clearBuffer() {
-		buffer.newTextGraphics().drawRectangle(new TerminalPosition(0, 0), buffer.getSize(), emptyCharacter);
+		buffer.newTextGraphics().fillRectangle(new TerminalPosition(0, 0), buffer.getSize(), emptyCharacter);
+	}
+	
+	private void drawLocal(HashMap<String, RelativePosition> vision, int viewDistance, Position camPos, CameraWindow camWindow) {
+		//Right now this just goes through ALL the tiles grabbed a relative process
+		//So no more relativeness SHOULD NEED TO BE DONE!!!
+		//Instead, we should do a traditional LOS kinda
+		//but change vision to be a hashmap of tile IDs indexed by relative positions (which include ID anyways)
+		//Then have a loop through the edge of a circle of radius=sight.distance
+		//and it should draw every character along the way, from center out
+		//to avoid retracing rays.
+		//Do findLine, 
+		
+		Position playerPos = mPosition.create(perspective);
+		Sight sight = mSight.create(perspective);
+		ChunkAddress playerChunkAddress = mChunkAddress.create(perspective);
+		Chunk playerChunk = FFMain.worldManager.getChunk(playerChunkAddress.worldID);
+		
+		ArrayList<String> circle = new ArrayList<String>();
+		int angleTicks = 100;
+		for (int angle=0; angle<angleTicks; angle++) {
+			int x = (int) (viewDistance * Math.cos((angle*1.0/angleTicks)*PI*2));
+			int y = (int) (viewDistance * Math.sin((angle*1.0/angleTicks)*PI*2));
+			//x and y are circular offsets from the player's position
+			//Check if this point in the circle has been looked at already
+			if (!circle.contains(x+"|"+y)) {
+				circle.add(x+"|"+y);
+				
+				//&& vision.containsKey((x+playerPos.x)+"|"+(y+playerPos.y))
+				
+				Position screenPos = new Position();
+				screenPos.x = x - camPos.x;
+				screenPos.y = y - camPos.y;
+				
+				//Start is player position, end is player position and the circular offset
+				FFMain.worldManager.LOS(playerChunk, playerPos.x, playerPos.y, x+playerPos.x, y+playerPos.y, camPos.x, camPos.y, buffer);
+			}
+		}
+		
+		//To fill in gaps
+		/*for (int angle=0; angle<angleTicks; angle++) {
+			int x = (int) (viewDistance-1 * Math.cos((angle*1.0/angleTicks)*PI*2));
+			int y = (int) (viewDistance-1 * Math.sin((angle*1.0/angleTicks)*PI*2));
+			//x and y are circular offsets from the player's position
+			//Check if this point in the circle has been looked at already
+			if (!circle.contains(x+"|"+y)) {
+				circle.add(x+"|"+y);
+				
+				//&& vision.containsKey((x+playerPos.x)+"|"+(y+playerPos.y))
+				
+				Position screenPos = new Position();
+				screenPos.x = x - camPos.x;
+				screenPos.y = y - camPos.y;
+				
+				//Start is player position, end is player position and the circular offset
+				FFMain.worldManager.LOS(playerChunk, playerPos.x, playerPos.y, x+playerPos.x, y+playerPos.y, camPos.x, camPos.y, buffer);
+			}
+		}*/
+		
+		for (RelativePosition rel : vision.values()) {
+			Tile tile = mTile.create(rel.e);
+			Char character = mChar.create(rel.e);
+			Position screenPos = new Position();
+			screenPos.x = rel.x - camPos.x;
+			screenPos.y = rel.y - camPos.y;
+			if (tile.seen) {
+				drawEntity(screenPos, tile, character);
+			}
+		}
 	}
 
-	private void drawLocal(ArrayList<RelativePosition> vision, Position camPos, CameraWindow camWindow) {
+	private void olddrawLocal(ArrayList<RelativePosition> vision, Position camPos, CameraWindow camWindow) {
+		//Right now this just goes through ALL the tiles grabbed a relative process
+		//So no more relativeness SHOULD NEED TO BE DONE!!!
+		//Instead, we should do a traditional LOS kinda
+		//but change vision to be a hashmap of tile IDs indexed by relative positions (which include ID anyways)
+		//Then have a loop through the edge of a circle of radius=sight.distance
+		//and it should draw every character along the way, from center out
+		//to avoid retracing rays.
+		//Do findLine, 
 		for (RelativePosition rel : vision) {
 			int t = rel.e;
 			Position pos = new Position();
@@ -131,7 +213,8 @@ public class TileRenderingSystem extends IteratingSystem { // This is for terrai
 					//TODO: this is significantly broken
 					//RESOLUTION(?): parameter "start" was the chunk of the destination tile, not the player's chunk.
 					//if (playerChunkAddress.worldID != chunkAddress.worldID) continue;
-					if (FFMain.worldManager.LOS(playerChunk, playerPos.x, playerPos.y, pos.x, pos.y)) { //TODO: CROSSING CHUNKS IS FUCKING BROKEN
+					//FFMain.worldManager.LOS(playerChunk, playerPos.x, playerPos.y, pos.x, pos.y, buffer);
+					if (FFMain.worldManager.badLOS(playerChunk, playerPos.x, playerPos.y, pos.x, pos.y)) { //TODO: CROSSING CHUNKS IS FUCKING BROKEN
 						if (!drawEntity(screenPos, tile, character)) {
 							buffer.setCharacterAt(screenPos.x, screenPos.y, character.getTextCharacter());
 						}

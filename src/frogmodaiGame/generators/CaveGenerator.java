@@ -88,8 +88,8 @@ public class CaveGenerator implements LevelGenerator {
 								Char ncharacter = mChar.create(nt);
 								if (ntile.solid == true) { // Solid adjacent to open
 									ncharacter.character = '#';
-									ncharacter.fgc = 8;
-									ncharacter.bgc = 0;
+									ncharacter.fgc = 3;
+									ncharacter.bgc = 1;
 								}
 							}
 						}

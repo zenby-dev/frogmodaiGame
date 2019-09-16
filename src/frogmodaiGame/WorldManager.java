@@ -1,6 +1,7 @@
 package frogmodaiGame;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Random;
 import java.util.function.*;
 
@@ -10,6 +11,7 @@ import com.googlecode.lanterna.TextColor;
 import com.googlecode.lanterna.input.KeyStroke;
 import com.googlecode.lanterna.input.KeyType;
 import com.googlecode.lanterna.screen.Screen;
+import com.googlecode.lanterna.screen.ScreenBuffer;
 
 import frogmodaiGame.components.*;
 import frogmodaiGame.generators.*;
@@ -73,6 +75,7 @@ public class WorldManager {
 		loadTestWorld(getChunk(chunk1));
 		loadTest2(getChunk(chunk2));
 		loadTest2(getChunk(chunk3));
+		generateTest();
 		
 		//getChunk(chunk1).attach(getChunk(chunk2), 2, 0);
 		getChunk(chunk1).attach(getChunk(chunk3), 0, -4);
@@ -315,9 +318,52 @@ public class WorldManager {
 		//System.out.println("");
 		return line;
 	}
-
-	//This function directly crawls through the tiles.neighbors array.
-	public boolean LOS(Chunk start, int x0, int y0, int x1, int y1) {
+	
+	public boolean worseLOS(Chunk start, int x0, int y0, int x1, int y1, int sx, int sy, ScreenBuffer buffer, HashMap<String, RelativePosition> vision) {
+		int t = start.getTile(x0, y0);
+		int[] line = findLine(x0, y0, x1, y1);
+		if (line == null) return true; //making this false makes the player unseeable
+		//int lastX = x0;
+		//int lastY = y0;
+		//if (line.length <= 2) return true; //very short line
+		//screen.setCharacter(x0, y0, new TextCharacter('@', TextColor.ANSI.CYAN, TextColor.ANSI.RED));
+		for (int i = 2; i < line.length; i += 2) {
+			int x = line[i];
+			int y = line[i + 1];
+			
+			if (x == -9999 || y == -9999) return false;
+			
+			System.out.println(x+"|"+y);
+			
+			if (!vision.containsKey(x+"|"+y)) return false; //SHRUG IDK BRO
+			
+			RelativePosition rel = vision.get(x+"|"+y);
+			
+			Tile newTile = mTile.create(rel.e);
+			Char newChar = mChar.create(rel.e);
+			ChunkAddress newTileChunkAddress = mChunkAddress.create(rel.e);
+			
+			buffer.setCharacterAt(x - sx, y - sy, newChar.getTextCharacter());
+			newTile.seen = true;
+			
+			if (newTile.solid) {
+				return false;
+			}
+		}
+		//screen.setCharacter(x1, y1, new TextCharacter('X', TextColor.ANSI.GREEN, TextColor.ANSI.YELLOW));
+		// for (int i : line) { // doesn't count solids at the beginning/end
+		// if (i != XYToi(x0, y0) && i != XYToi(x1, y1) && i != -1) {
+		// // if (x0 != x1 && y0 != y1)
+		// // System.out.println(String.format("%d %b", i, isSolid(i)));
+		// if (isSolid(i))
+		// return false;
+		// }
+		// }
+		// if (x0 != x1 && y0 != y1) System.out.println("AAA");
+		return true;
+	}
+	
+	public boolean LOS(Chunk start, int x0, int y0, int x1, int y1, int cx, int cy, ScreenBuffer buffer) {
 		int t = start.getTile(x0, y0);
 		int[] line = findLine(x0, y0, x1, y1);
 		if (line == null) return true; //making this false makes the player unseeable
@@ -362,6 +408,81 @@ public class WorldManager {
 			
 			
 			Tile newTile = mTile.create(t);
+			Char newChar = mChar.create(t);
+			ChunkAddress newTileChunkAddress = mChunkAddress.create(t);
+			
+			buffer.setCharacterAt(x - cx, y - cy, newChar.getTextCharacter());
+			newTile.seen = true;
+			
+			//if (x != x0 && x != x1 && y != y0 && y != y1) { //don't check solidity of start/end tiles
+			//if (!((x == x0 && y == y0) || (x == x1 && y == y1))) {
+			if (!((x == x0 && y == y0) || (x == x1 && y == y1))) {
+				if (newTile.solid) {
+					//screen.setCharacter(x, y, new TextCharacter('X', TextColor.ANSI.CYAN, TextColor.ANSI.RED));
+					return false;
+				}
+			}
+		}
+		//screen.setCharacter(x1, y1, new TextCharacter('X', TextColor.ANSI.GREEN, TextColor.ANSI.YELLOW));
+		// for (int i : line) { // doesn't count solids at the beginning/end
+		// if (i != XYToi(x0, y0) && i != XYToi(x1, y1) && i != -1) {
+		// // if (x0 != x1 && y0 != y1)
+		// // System.out.println(String.format("%d %b", i, isSolid(i)));
+		// if (isSolid(i))
+		// return false;
+		// }
+		// }
+		// if (x0 != x1 && y0 != y1) System.out.println("AAA");
+		return true;
+	}
+
+	//This function directly crawls through the tiles.neighbors array.
+	public boolean badLOS(Chunk start, int x0, int y0, int x1, int y1) {
+		int t = start.getTile(x0, y0);
+		int[] line = findLine(x0, y0, x1, y1);
+		if (line == null) return true; //making this false makes the player unseeable
+		//int lastX = x0;
+		//int lastY = y0;
+		//if (line.length <= 2) return true; //very short line
+		//screen.setCharacter(x0, y0, new TextCharacter('@', TextColor.ANSI.CYAN, TextColor.ANSI.RED));
+		for (int i = 2; i < line.length; i += 2) {
+			int x = line[i];
+			int y = line[i + 1];
+			//if (x == -1 && y == -1) break; 
+			Position d = new Position();
+			d.x = x - line[i-2];
+			d.y = y - line[i-1];
+			
+			//screen.setCharacter(x, y, new TextCharacter((char)((i/2)+48), TextColor.ANSI.RED, TextColor.ANSI.CYAN));
+			//System.out.println(String.format("%d,%d %d,%d", x, y, d.x, d.y));
+			//if (x == 0 && y == 0 && (Math.abs(d.x) > 1 || Math.abs(d.y) > 1)) return true; //passed end of the line
+			if (x == -9999 && y == -9999) {
+				//screen.setCharacter(line[i-2], line[i-1], new TextCharacter((char)((i/2)+48), TextColor.ANSI.RED, TextColor.ANSI.CYAN));
+				return true; //if false, there diagonal directions cannot be seen
+			}//doesn't affect tunnel issue
+			
+			
+			
+			Tile oldTile = mTile.create(t);
+			ChunkAddress tileChunkAddress = mChunkAddress.create(t);
+			
+			//screen.setCharacter(line[i-2], line[i-1], new TextCharacter((char)((i/2)+48), TextColor.ANSI.GREEN, TextColor.ANSI.MAGENTA));
+
+			int dir = DirectionConverter.toInt(d);
+			//screen.setCharacter(x, y, new TextCharacter((char)((dir)+48), TextColor.ANSI.RED, TextColor.ANSI.CYAN));
+			//There's an extra row present when the bleed is present!!!!
+			
+			//if (dir == -1) System.out.println(String.format("%d,%d %d,%d", x, y, d.x, d.y));
+			if (dir == -1) return false; //TODO: why is this returning -1 ever?
+			int neighbor = oldTile.neighbors[dir];
+			if (neighbor == -1) return false; //THE BLEED IN THE TUNNEL
+			t = neighbor;
+			
+			//screen.setCharacter(x, y, new TextCharacter((char)((dir)+48), TextColor.ANSI.RED, TextColor.ANSI.CYAN));
+			
+			
+			Tile newTile = mTile.create(t);
+			Char newChar = mChar.create(t);
 			ChunkAddress newTileChunkAddress = mChunkAddress.create(t);
 			
 			

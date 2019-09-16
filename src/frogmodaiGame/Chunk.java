@@ -128,7 +128,7 @@ public class Chunk { // SHOULD NOT CONTAIN ANY GENERATION CODE
 	//Swap in multiplicities with shorter path length.
 	//use this as final list of points, as it will only contain shortest paths.
 	
-	public void floodGrab(Position startPos, RelativePosition rel, int d, int e, final ArrayList<RelativePosition> list) {
+	public void floodGrab(Position startPos, RelativePosition rel, int d, int e, final HashMap<String, RelativePosition> list) {
 		//"list" is the final list of included RelativePositions.
 		//"touched" is all RelativePositions that have already been explored.
 		//"todo" is the list of all neighbors flagged for checking on the previous cycle.
@@ -159,11 +159,16 @@ public class Chunk { // SHOULD NOT CONTAIN ANY GENERATION CODE
 		list.clear();
 		for (RelativePosition p : touched.values()) {
 			if (p.withinDistance(startPos, d))
-				list.add(p);
+				//System.out.println((p.x-startPos.x)+"|"+(p.y-startPos.y));
+				//System.out.println((p.x)+"|"+(p.y));
+				//list.put(p.x+"|"+p.y, p);
+				//p.x -= startPos.x;
+				//p.y -= startPos.y;
+				list.put(p.x+"|"+p.y, p);
 		}
 	}
 
-	public void floodGrabCheckTile(Position startPos, RelativePosition rel, int d, float _depth, int e, final ArrayList<RelativePosition> list,
+	public void floodGrabCheckTile(Position startPos, RelativePosition rel, int d, float _depth, int e, final HashMap<String, RelativePosition> list,
 			final HashMap<String, RelativePosition> touched, final ArrayList<RelativePosition> todo, Random random) {
 		Tile tile = mTile.create(e); // These tiles aren't necessarily in the same chunk
 		Position tilePos = mPosition.create(e);
@@ -185,7 +190,7 @@ public class Chunk { // SHOULD NOT CONTAIN ANY GENERATION CODE
 		// if (!FFMain.worldManager.getActiveChunk().LOS(rel.x, rel.y, tilePos.x,
 		// tilePos.y)) return;
 
-		list.add(rel);
+		list.put(rel.x+"|"+rel.y, rel);
 		
 		if (tile.solid) return;
 		

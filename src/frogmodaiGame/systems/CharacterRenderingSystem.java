@@ -50,13 +50,14 @@ public class CharacterRenderingSystem extends IteratingSystem { // Pretty loose 
 			if (screenPos.x >= 0 && screenPos.y >= 0 && screenPos.x < camWindow.width && screenPos.y < camWindow.height) {
 				//Only draw inside the camera window
 				//if (FFMain.playerID == -1 || FFMain.playerID == e) { // rendering without a player...
+				System.out.println("HELP");
 				if (perspective == -1) {
 					screen.setCharacter(screenPos.x, screenPos.y, character.getTextCharacter());
 				} else {
 					Position playerPos = mPosition.create(perspective);
 					Sight sight = mSight.create(perspective);
 					if (pos.withinDistance(playerPos, sight.distance)) {
-						if (FFMain.worldManager.LOS(chunk, playerPos.x, playerPos.y, pos.x, pos.y)) {
+						if (FFMain.worldManager.badLOS(chunk, playerPos.x, playerPos.y, pos.x, pos.y)) {
 							TextCharacter ct = character.getTextCharacter();
 							int tile = chunk.getTile(playerPos.x, playerPos.y);
 							Char tileChar = mChar.create(tile);
