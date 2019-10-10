@@ -8,10 +8,14 @@ import com.artemis.systems.IteratingSystem;
 import frogmodaiGame.Chunk;
 import frogmodaiGame.FFMain;
 import frogmodaiGame.components.*;
+import frogmodaiGame.events.CameraShift;
+import net.mostlyoriginal.api.event.common.EventSystem;
 
 public class CameraMovingSystem extends IteratingSystem {
 	ComponentMapper<Position> mPosition;
 	ComponentMapper<CameraWindow> mCameraWindow;
+	
+	EventSystem es;
 
 	public CameraMovingSystem() {
 		super(Aspect.all(Position.class, CameraWindow.class));
@@ -65,7 +69,8 @@ public class CameraMovingSystem extends IteratingSystem {
 		camPos.y += dy;
 		
 		if (dx != 0 || dy != 0)
-			FFMain.worldManager.triggerTileRedraw();
+			es.dispatch(new CameraShift(dx, dy));
+			//FFMain.worldManager.triggerTileRedraw();
 
 	}
 

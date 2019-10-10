@@ -1,0 +1,14 @@
+9/17/19
+The action system needs to be able to return to the player for further input!!
+See: ADOM when you walk into someone and it gives you a yes/no choice for talking/hitting(?)
+
+9/18/19
+I want to implement this instead of the current system
+http://www.roguebasin.com/index.php?title=A_priority_queue_based_turn_scheduling_system
+
+9/23/19
+I think I fixed the issue of what's rendered not matching up exactly with where actors are by moving rendering
+to happen at the beginning of each cycle right after TimeSystem runs (which doesn't actually )
+
+10/6/19
+No i definitely didn't fix that yet

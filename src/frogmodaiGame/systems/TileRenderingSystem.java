@@ -21,6 +21,8 @@ import com.googlecode.lanterna.screen.ScreenBuffer;
 import frogmodaiGame.Chunk;
 import frogmodaiGame.FFMain;
 import frogmodaiGame.components.*;
+import frogmodaiGame.events.CameraShift;
+import net.mostlyoriginal.api.event.common.Subscribe;
 
 public class TileRenderingSystem extends IteratingSystem { // This is for terrain only
 	ComponentMapper<Tile> mTile;
@@ -48,7 +50,8 @@ public class TileRenderingSystem extends IteratingSystem { // This is for terrai
 		screen = _screen;
 		System.out.printf("%d, %d\n", FFMain.screenWidth/2, FFMain.screenHeight);
 		buffer = new ScreenBuffer(new TerminalSize(FFMain.screenWidth/2, FFMain.screenHeight), new TextCharacter(' ', TextColor.ANSI.BLACK, TextColor.ANSI.BLACK));
-		emptyCharacter = new TextCharacter('X', TextColor.ANSI.YELLOW, TextColor.ANSI.BLUE);
+		//emptyCharacter = new TextCharacter('X', TextColor.ANSI.YELLOW, TextColor.ANSI.BLUE);
+		emptyCharacter = new TextCharacter(' ', TextColor.ANSI.BLACK, TextColor.ANSI.BLACK);
 	}
 	
 	public void triggerRedraw() {
@@ -86,7 +89,7 @@ public class TileRenderingSystem extends IteratingSystem { // This is for terrai
 		if (fullRedraw) {
 			clearBuffer();
 
-			memoryDraw(camPos, camWindow);
+			//memoryDraw(camPos, camWindow);
 			//drawLocal(vision, sight.distance, camPos, camWindow);
 			olddrawLocal(vision, camPos, camWindow);
 			fullRedraw = false;
@@ -100,6 +103,11 @@ public class TileRenderingSystem extends IteratingSystem { // This is for terrai
 			
 		//FFMain.worldManager.mapLoader.drawMap();
 
+	}
+	
+	@Subscribe
+	public void CameraShiftListener(CameraShift event) {
+		//FFMain.sendMessage(event.dx + ", " + event.dy);
 	}
 	
 	private void clearBuffer() {

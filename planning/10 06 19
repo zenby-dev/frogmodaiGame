@@ -1,0 +1,62 @@
+10/6/19
+Geordan Jehovah's Miniscule Parliment Breathing Hot Fire Upon Bargain-Bin Ladle Folk
+Dungeon poop
+fart fart fart
+need to make LOOK command
+which means need to make a CURSOR MODE (that can be reused in the Editor)
+need make vaults (with entrances mapped out)
+
+how should the world be structured for now? I like the one-way portals out from the hub area kinda thing
+I want to start making some villages in addition to dungeons
+dungeons are just where monsters live, they aren't necessarily evil
+write dat morality/ethic/value system!!!
+
+Races:
+The Humanoids
+	Humans
+	Elves
+	Dwarfs
+	Doublelings
+The Animal Folks (as non-anthropomorphic as possible)
+	FROGS
+	Bears
+	Cats
+The Insect Folks
+	Flies
+	Mantises
+	Beetles
+	Slugs
+The Reptile Folks
+	Iguanas
+	Turtles
+The Alien Starfish Folks
+	Lobsters
+	Crabs
+	SHRIMP
+	Starfish
+	SquidFolk
+	
+10/8/19
+Vaults for stock room shapes
+Prefabs for things in rooms
+	Large, Medium, and Small Features? (or like 1x1, 2x2, 3x3 etc sized 'feature slots')
+		Then vaults have base terrain, terrain modifiers (eg. walls in different places), features, and objects
+	Random objects that can be picked up or examined
+	
+Todo: test container system
+Would a table or a shelf use a container? Yes probably
+	Need a two-pane GUI for moving items between two containers (eg. inventory <-> table)
+	
+Have areas like Shadowgate where you need to carry a torch or some such
+I would rather have puzzley stuff like that/SS13 kinda things (hand/item holding mechanics) than RPG stat grids
+I would also prefer that it has actions that are not associated so closely to item categories like potions or wands
+
+
+
+
+
+
+
+
+
+

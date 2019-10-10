@@ -6,5 +6,13 @@
 	<classpathentry kind="lib" path="/Users/robertcardinal/eclipse-workspace/frogmodaiGame/lib/joise-1.1.0.jar"/>
 	<classpathentry kind="lib" path="/Users/robertcardinal/eclipse-workspace/frogmodaiGame/lib/lanterna.jar"/>
 	<classpathentry kind="lib" path="/Users/robertcardinal/eclipse-workspace/frogmodaiGame/lib/noiseDevelop.jar"/>
+	<classpathentry kind="lib" path="/Users/robertcardinal/eclipse-workspace/frogmodaiGame/lib/artemis-contrib-eventbus.jar"/>
+	<classpathentry kind="lib" path="/Users/robertcardinal/eclipse-workspace/frogmodaiGame/lib/artemis-fluid-core.jar"/>
+	<classpathentry kind="lib" path="/Users/robertcardinal/eclipse-workspace/frogmodaiGame/lib/artemis-odb-serializer-json.jar"/>
+	<classpathentry kind="lib" path="/Users/robertcardinal/eclipse-workspace/frogmodaiGame/lib/artemis-odb-serializer.jar"/>
+	<classpathentry kind="lib" path="/Users/robertcardinal/eclipse-workspace/frogmodaiGame/lib/artemis-odb-serializer-json-libgdx.jar"/>
+	<classpathentry kind="lib" path="/Users/robertcardinal/eclipse-workspace/frogmodaiGame/lib/contrib-plugin-operations.jar"/>
+	<classpathentry kind="lib" path="/Users/robertcardinal/eclipse-workspace/frogmodaiGame/lib/contrib-core.jar"/>
+	<classpathentry kind="lib" path="/Users/robertcardinal/eclipse-workspace/frogmodaiGame/lib/jsonbeans-0.9.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

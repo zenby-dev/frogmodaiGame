@@ -11,6 +11,7 @@ import com.artemis.World;
 import com.artemis.systems.IteratingSystem;
 import com.googlecode.lanterna.TextCharacter;
 import com.googlecode.lanterna.TextColor;
+import com.googlecode.lanterna.TextColor.ANSI;
 import com.googlecode.lanterna.screen.Screen;
 
 import frogmodaiGame.components.*;
@@ -528,6 +529,316 @@ public class Chunk { // SHOULD NOT CONTAIN ANY GENERATION CODE
 		
 		return true;
 	}
+
+	public boolean portal(Chunk chunk, int w, int dir, int _ox, int _oy, int _dx, int _dy, boolean wall) {
+		for (int i = 0; i < w; i++) { //width of opening
+			if (dir == 0) {//portal opens left, extends down
+				int ox = _ox;
+				int oy = _oy + i;
+				int dx = _dx;
+				int dy = _dy + i;
+				
+				int me = getTile(ox, oy); //portal in
+				if (chunk.posInChunk(dx, dy)) {
+					int them = chunk.getTile(dx, dy); //portal out
+					Tile meTile = mTile.create(me);
+					Tile themTile = mTile.create(them);
+					meTile.neighbors[4] = them; //portal's rightward neighbor
+					//themTile.neighbors[3] = me; //destination's leftward neighbor
+					if (i == 0 && posInChunk(ox,oy-1)) {
+						int me2 = getTile(ox,oy-1);
+						Tile meTile2 = mTile.create(me2);
+						meTile2.neighbors[7] = them;
+					}
+					if (i == w-1 && posInChunk(ox,oy+1)) {
+						int me2 = getTile(ox,oy+1);
+						Tile meTile2 = mTile.create(me2);
+						meTile2.neighbors[2] = them;
+					}
+				}
+				if (chunk.posInChunk(dx, dy-1)) {
+					int them = chunk.getTile(dx, dy-1); //portal out
+					Tile meTile = mTile.create(me);
+					Tile themTile = mTile.create(them);
+					meTile.neighbors[2] = them; //portal's rightward neighbor
+					//themTile.neighbors[5] = me; //destination's leftward neighbor
+				}
+				if (chunk.posInChunk(dx, dy+1)) {
+					int them = chunk.getTile(dx, dy+1); //portal out
+					Tile meTile = mTile.create(me);
+					Tile themTile = mTile.create(them);
+					meTile.neighbors[7] = them; //portal's rightward neighbor
+					//themTile.neighbors[0] = me; //destination's leftward neighbor
+				}
+				
+				if (wall) {
+					if (posInChunk(ox+1, oy)) {
+						int mewall = getTile(ox+1, oy);
+						Tile tile = mTile.create(mewall);
+						Char character = mChar.create(mewall);
+						tile.solid = true;
+						character.character = '#';
+						character.fgc = TextColor.ANSI.DEFAULT.ordinal();
+						character.bold = false;
+					}
+				}
+			} else if (dir == 1) { //portal opens up, extends right
+				int ox = _ox + i;
+				int oy = _oy;
+				int dx = _dx + i;
+				int dy = _dy;
+				
+				int me = getTile(ox, oy); //portal in
+				if (chunk.posInChunk(dx, dy)) {
+					int them = chunk.getTile(dx, dy); //portal out
+					Tile meTile = mTile.create(me);
+					Tile themTile = mTile.create(them);
+					meTile.neighbors[6] = them; //portal's downward neighbor
+					//themTile.neighbors[1] = me; //destination's upward neighbor
+					
+					if (i == 0 && posInChunk(ox-1,oy)) {
+						int me2 = getTile(ox-1,oy);
+						Tile meTile2 = mTile.create(me2);
+						meTile2.neighbors[7] = them;
+					}
+					if (i == w-1 && posInChunk(ox+1,oy)) {
+						int me2 = getTile(ox+1,oy);
+						Tile meTile2 = mTile.create(me2);
+						meTile2.neighbors[5] = them;
+					}
+				}
+				if (chunk.posInChunk(dx-1, dy)) {
+					int them = chunk.getTile(dx-1, dy); //portal out
+					Tile meTile = mTile.create(me);
+					Tile themTile = mTile.create(them);
+					meTile.neighbors[5] = them; //portal's downward neighbor
+					//themTile.neighbors[2] = me; //destination's upward neighbor
+				}
+				if (chunk.posInChunk(dx+1, dy)) {
+					int them = chunk.getTile(dx+1, dy); //portal out
+					Tile meTile = mTile.create(me);
+					Tile themTile = mTile.create(them);
+					meTile.neighbors[7] = them; //portal's downward neighbor
+					//themTile.neighbors[0] = me; //destination's upward neighbor
+				}
+				
+				if (wall) {
+					if (posInChunk(ox, oy+1)) {
+						int mewall = getTile(ox, oy+1);
+						Tile tile = mTile.create(mewall);
+						Char character = mChar.create(mewall);
+						tile.solid = true;
+						character.character = '#';
+						character.fgc = TextColor.ANSI.DEFAULT.ordinal();
+						character.bold = false;
+					}
+				}
+			} else if (dir == 2) { //portal opens right, extends down
+				int ox = _ox;
+				int oy = _oy + i;
+				int dx = _dx;
+				int dy = _dy + i;
+				
+				int me = getTile(ox, oy); //portal in
+				if (chunk.posInChunk(dx, dy)) {
+					int them = chunk.getTile(dx, dy); //portal out
+					Tile meTile = mTile.create(me);
+					Tile themTile = mTile.create(them);
+					meTile.neighbors[3] = them; //portal's leftward neighbor
+					//themTile.neighbors[4] = me; //destination's rightward neighbor
+					if (i == 0 && posInChunk(ox,oy-1)) {
+						int me2 = getTile(ox,oy-1);
+						Tile meTile2 = mTile.create(me2);
+						meTile2.neighbors[5] = them;
+					}
+					if (i == w-1 && posInChunk(ox,oy+1)) {
+						int me2 = getTile(ox,oy+1);
+						Tile meTile2 = mTile.create(me2);
+						meTile2.neighbors[0] = them;
+					}
+				}
+				if (chunk.posInChunk(dx, dy-1)) {
+					int them = chunk.getTile(dx, dy-1); //portal out
+					Tile meTile = mTile.create(me);
+					Tile themTile = mTile.create(them);
+					meTile.neighbors[0] = them; //portal's leftward neighbor
+					//themTile.neighbors[7] = me; //destination's rightward neighbor
+				}
+				if (chunk.posInChunk(dx, dy+1)) {
+					int them = chunk.getTile(dx, dy+1); //portal out
+					Tile meTile = mTile.create(me);
+					Tile themTile = mTile.create(them);
+					meTile.neighbors[5] = them; //portal's leftward neighbor
+					//themTile.neighbors[2] = me; //destination's rightward neighbor
+				}
+				
+				if (wall) {
+					if (posInChunk(ox-1, oy)) {
+						int mewall = getTile(ox-1, oy);
+						Tile tile = mTile.create(mewall);
+						Char character = mChar.create(mewall);
+						tile.solid = true;
+						character.character = '#';
+						character.fgc = TextColor.ANSI.DEFAULT.ordinal();
+						character.bold = false;
+					}
+				}
+			} else if (dir == 3) { //portal opens down, extends right
+				int ox = _ox + i;
+				int oy = _oy;
+				int dx = _dx + i;
+				int dy = _dy;
+				
+				int me = getTile(ox, oy); //portal in
+				if (chunk.posInChunk(dx, dy)) {
+					int them = chunk.getTile(dx, dy); //portal out
+					Tile meTile = mTile.create(me);
+					Tile themTile = mTile.create(them);
+					meTile.neighbors[1] = them; //portal's upward neighbor
+					//themTile.neighbors[6] = me; //destination's downward neighbor
+					if (i == 0 && posInChunk(ox-1,oy)) {
+						int me2 = getTile(ox-1,oy);
+						Tile meTile2 = mTile.create(me2);
+						meTile2.neighbors[2] = them;
+					}
+					if (i == w-1 && posInChunk(ox+1,oy)) {
+						int me2 = getTile(ox+1,oy);
+						Tile meTile2 = mTile.create(me2);
+						meTile2.neighbors[0] = them;
+					}
+				}
+				if (chunk.posInChunk(dx-1, dy)) {
+					int them = chunk.getTile(dx-1, dy); //portal out
+					Tile meTile = mTile.create(me);
+					Tile themTile = mTile.create(them);
+					meTile.neighbors[0] = them; //portal's upward neighbor
+					//themTile.neighbors[7] = me; //destination's downward neighbor
+				}
+				if (chunk.posInChunk(dx+1, dy)) {
+					int them = chunk.getTile(dx+1, dy); //portal out
+					Tile meTile = mTile.create(me);
+					Tile themTile = mTile.create(them);
+					meTile.neighbors[2] = them; //portal's upward neighbor
+					//themTile.neighbors[5] = me; //destination's downward neighbor
+				}
+				
+				if (wall) {
+					if (posInChunk(ox, oy-1)) {
+						int mewall = getTile(ox, oy-1);
+						Tile tile = mTile.create(mewall);
+						Char character = mChar.create(mewall);
+						tile.solid = true;
+						character.character = '#';
+						character.fgc = TextColor.ANSI.DEFAULT.ordinal();
+						character.bold = false;
+					}
+				}
+			}
+		}
+		/*if (side == 0) { //left
+			for (int y = 0; y < height; y++) {
+				int me = getTile(0, y);
+				if (chunk.posInChunk(chunk.width-1, y + parallelAlignment)) {
+					int them = chunk.getTile(chunk.width-1, y + parallelAlignment);
+					Tile meTile = mTile.create(me);
+					Tile themTile = mTile.create(them);
+					meTile.neighbors[3] = them;
+					//themTile.neighbors[4] = me;
+				}
+				if (chunk.posInChunk(chunk.width-1, y+1 + parallelAlignment)) {
+					int them = chunk.getTile(chunk.width-1, y+1 + parallelAlignment);
+					Tile meTile = mTile.create(me);
+					Tile themTile = mTile.create(them);
+					meTile.neighbors[5] = them;
+					//themTile.neighbors[2] = me;
+				}
+				if (chunk.posInChunk(chunk.width-1, y-1 + parallelAlignment)) {
+					int them = chunk.getTile(chunk.width-1, y-1 + parallelAlignment);
+					Tile meTile = mTile.create(me);
+					Tile themTile = mTile.create(them);
+					meTile.neighbors[0] = them;
+					//themTile.neighbors[7] = me;
+				}
+			}
+		} else if (side == 1) {//up
+			for (int x = 0; x < width; x++) {
+				int me = getTile(x, 0);
+				if (chunk.posInChunk(x + parallelAlignment, chunk.height-1)) {
+					int them = chunk.getTile(x + parallelAlignment, chunk.height-1);
+					Tile meTile = mTile.create(me);
+					Tile themTile = mTile.create(them);
+					meTile.neighbors[1] = them;
+					//themTile.neighbors[6] = me;
+				}
+				if (chunk.posInChunk(x+1 + parallelAlignment, chunk.height-1)) {
+					int them = chunk.getTile(x+1 + parallelAlignment, chunk.height-1);
+					Tile meTile = mTile.create(me);
+					Tile themTile = mTile.create(them);
+					meTile.neighbors[2] = them;
+					//themTile.neighbors[5] = me;
+				}
+				if (chunk.posInChunk(x-1 + parallelAlignment, chunk.height-1)) {
+					int them = chunk.getTile(x-1 + parallelAlignment, chunk.height-1);
+					Tile meTile = mTile.create(me);
+					Tile themTile = mTile.create(them);
+					meTile.neighbors[0] = them;
+					//themTile.neighbors[7] = me;
+				}
+			}
+		} else if (side == 2) {//right
+			for (int y = 0; y < height; y++) {
+				int me = getTile(width-1, y);
+				if (chunk.posInChunk(0, y + parallelAlignment)) {
+					int them = chunk.getTile(0, y + parallelAlignment);
+					Tile meTile = mTile.create(me);
+					Tile themTile = mTile.create(them);
+					meTile.neighbors[4] = them;
+					//themTile.neighbors[3] = me;
+				}
+				if (chunk.posInChunk(0, y+1 + parallelAlignment)) {
+					int them = chunk.getTile(0, y+1 + parallelAlignment);
+					Tile meTile = mTile.create(me);
+					Tile themTile = mTile.create(them);
+					meTile.neighbors[7] = them;
+					//themTile.neighbors[0] = me;
+				}
+				if (chunk.posInChunk(0, y-1 + parallelAlignment)) {
+					int them = chunk.getTile(0, y-1 + parallelAlignment);
+					Tile meTile = mTile.create(me);
+					Tile themTile = mTile.create(them);
+					meTile.neighbors[2] = them;
+					//themTile.neighbors[5] = me;
+				}
+			}
+		} else if (side == 3) {//down
+			for (int x = 0; x < width; x++) {
+				int me = getTile(x, height-1);
+				if (chunk.posInChunk(x + parallelAlignment, 0)) {
+					int them = chunk.getTile(x + parallelAlignment, 0);
+					Tile meTile = mTile.create(me);
+					Tile themTile = mTile.create(them);
+					meTile.neighbors[6] = them;
+					//themTile.neighbors[1] = me;
+				}
+				if (chunk.posInChunk(x+1 + parallelAlignment, 0)) {
+					int them = chunk.getTile(x+1 + parallelAlignment, 0);
+					Tile meTile = mTile.create(me);
+					Tile themTile = mTile.create(them);
+					meTile.neighbors[7] = them;
+					//themTile.neighbors[0] = me;
+				}
+				if (chunk.posInChunk(x-1 + parallelAlignment, 0)) {
+					int them = chunk.getTile(x-1 + parallelAlignment, 0);
+					Tile meTile = mTile.create(me);
+					Tile themTile = mTile.create(them);
+					meTile.neighbors[5] = them;
+					//themTile.neighbors[2] = me;
+				}
+			}
+		}*/
+		
+		return true;
+	}
 	
 	public boolean attachSingleTile(Chunk chunk, int side, int alignment, int indexA, int indexB) {
 		if (side == 0) { //left
@@ -658,6 +969,7 @@ public class Chunk { // SHOULD NOT CONTAIN ANY GENERATION CODE
 
 	public void load() {
 		//System.out.println("TODO: Chunk.load");
+		FFMain.sendMessage(worldID + "");
 	}
 }
 

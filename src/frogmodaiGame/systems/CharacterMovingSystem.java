@@ -96,6 +96,8 @@ public class CharacterMovingSystem extends BaseEntitySystem {
 						return false;
 					}
 					
+					boolean sameChunk = chunkAddress.worldID == tileChunkAddress.worldID;
+					
 					//These were before failure points!!!! Don't mutate data b4 failure points please.
 					chunkAddress.worldID = tileChunkAddress.worldID;
 					
@@ -109,7 +111,9 @@ public class CharacterMovingSystem extends BaseEntitySystem {
 					//onTile.tile = newChunk.getTile(pos.x, pos.y);
 					newChunk.setOccupied(pos.x, pos.y, true);
 					if (mIsPlayer.has(e)) {
-						FFMain.worldManager.shiftChunks(newChunk);
+						if (!sameChunk)
+							FFMain.worldManager.shiftChunks(newChunk);
+						
 						int nx = pos.x + camOffset.x - move.dx;
 						int ny = pos.y + camOffset.y - move.dy;
 						//nx %= camWindow.width;
@@ -158,7 +162,11 @@ public class CharacterMovingSystem extends BaseEntitySystem {
 		return true;
 	}
 
-	private void collisionEvent(int e, int neighbor) {
+	private void collisionEvent(int e, int neighbor) { //idk how i feel about this
+		//should use the new event system
+		//and consider having collisions like this only activate
+		//very specific context sensitive actions?
+		//And otherwise use standard roguelike controls or an "action" key + direction like caves of qud
 		OnTouch onTouch = mOnTouch.create(e);
 		onTouch.act.accept(e, neighbor);
 		

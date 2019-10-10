@@ -6,26 +6,39 @@ import java.util.Random;
 import java.util.function.*;
 
 import com.artemis.*;
+import com.artemis.io.JsonArtemisSerializer;
+import com.artemis.managers.WorldSerializationManager;
+import com.googlecode.lanterna.TerminalPosition;
 import com.googlecode.lanterna.TextCharacter;
 import com.googlecode.lanterna.TextColor;
+import com.googlecode.lanterna.graphics.TextGraphics;
 import com.googlecode.lanterna.input.KeyStroke;
 import com.googlecode.lanterna.input.KeyType;
 import com.googlecode.lanterna.screen.Screen;
 import com.googlecode.lanterna.screen.ScreenBuffer;
 
 import frogmodaiGame.components.*;
+import frogmodaiGame.events.CameraShift;
+import frogmodaiGame.events.ChangeStat;
+import frogmodaiGame.events.HPAtZero;
 import frogmodaiGame.generators.*;
 import frogmodaiGame.systems.*;
+import net.mostlyoriginal.api.event.common.Event;
+import net.mostlyoriginal.api.event.common.EventSystem;
+import net.mostlyoriginal.api.event.common.Subscribe;
+import net.mostlyoriginal.plugin.OperationsPlugin;
 
 public class WorldManager {
 	ArrayList<Chunk> chunkList;
 	public World world;
-	CreatureBuilder creatureBuilder;
-	ItemBuilder itemBuilder;
+	public CreatureBuilder creatureBuilder;
+	public ItemBuilder itemBuilder;
 	public UIHelper uiHelper;
 	public int activeChunk = -1;
 	//TileRenderingSystem tileRender;
 	Screen screen;
+	
+	final WorldSerializationManager serialManager = new WorldSerializationManager();
 
 	CaveGenerator caveGenerator;
 	public MapLoader mapLoader;
@@ -34,6 +47,8 @@ public class WorldManager {
 	ComponentMapper<Char> mChar;
 	ComponentMapper<Position> mPosition;
 	ComponentMapper<ChunkAddress> mChunkAddress;
+	
+	EventSystem es;
 
 	public WorldManager(Screen _screen) {
 		chunkList = new ArrayList<Chunk>();
@@ -48,8 +63,11 @@ public class WorldManager {
 	void initWorld(Screen _screen) {
 		WorldConfiguration config = new WorldConfigurationBuilder()
 				// .dependsOn(MyPlugin.class)
+				.dependsOn(EventSystem.class)
 				.with(
+						serialManager,
 						new TimeSystem(), 
+						//new TileRenderingSystem(_screen),
 						new CharacterMovingSystem(), 
 						new CameraMovingSystem(),
 						new TileOccupationClearingSystem(), 
@@ -57,6 +75,7 @@ public class WorldManager {
 						new PickupSystem(),
 						new DropSystem(), 
 						new ItemRelocatingSystem(), 
+						new HPSystem(),
 						new DescriptiveTextSystem(_screen),
 						new TileRenderingSystem(_screen),
 						new PositionGhostSystem(_screen), 
@@ -64,10 +83,44 @@ public class WorldManager {
 				.build();
 		world = new World(config);
 		world.inject(this);
+		
+		serialManager.setSerializer(new JsonArtemisSerializer(world));
+		
+		
+		registerAllEvents();
+		
 		screen = _screen;
 	}
 	
+	public void registerEvents(Object a) {
+		world.getSystem(EventSystem.class).registerEvents(a);
+	}
+	
+	public void registerAllEvents() {
+		registerEvents(this);
+	}
+	
+	public void runEventSet(CancellableEvent _before, CancellableEvent _during, Event _after) {
+		CancellableEvent before = _before;
+		//System.out.println(es);
+		es.dispatch(before);
+		if (!before.isCancelled()) {
+			CancellableEvent during = _during;
+			es.dispatch(during);
+			if (!during.isCancelled()) {
+				Event after = _after;
+				es.dispatch(after);
+			}
+		}
+	}
+	
 	public boolean refreshNeeded() {
+		if (uiHelper.triggerRedraw) {
+			uiHelper.triggerRedraw = false;
+			world.getSystem(TileRenderingSystem.class).triggerRedraw();
+			world.getSystem(DescriptiveTextSystem.class).triggerRedraw();
+			return true;
+		}
 		if (		world.getSystem(TileRenderingSystem.class).drewThisFrame ||
 				world.getSystem(DescriptiveTextSystem.class).drewThisFrame)
 			return true;
@@ -75,31 +128,8 @@ public class WorldManager {
 	}
 
 	public void start() {
-		int chunk1 = createChunk(12*8, 12*8);
-		int chunk2 = createChunk(4, 36);
-		int chunk3 = createChunk(36, 4);
-		setActiveChunk(chunk1);
-		// generateTest();
-		loadTestWorld(getChunk(chunk1));
-		loadTest2(getChunk(chunk2));
-		loadTest2(getChunk(chunk3));
-		generateTest();
-		
-		//getChunk(chunk1).attach(getChunk(chunk2), 2, 0);
-		getChunk(chunk1).attach(getChunk(chunk3), 0, -4);
-		//getChunk(chunk2).attach(getChunk(chunk1), 0, 0);
-		getChunk(chunk2).attach(getChunk(chunk3), 2, -(36/2-2));
-		getChunk(chunk3).attach(getChunk(chunk2), 0, 36/2-2);
-		getChunk(chunk3).attach(getChunk(chunk1), 2, 4);
-		
-		getChunk(chunk1).attach(getChunk(chunk2), 1, -4);
-		getChunk(chunk2).attach(getChunk(chunk1), 3, 4);
-		
-		getChunk(chunk1).attach(getChunk(chunk2), 3, -4);
-		getChunk(chunk2).attach(getChunk(chunk1), 1, 4);
-		
-		getChunk(chunk3).attachSingleTile(getChunk(chunk1), 1, 0, (36/2), 10);
-		getChunk(chunk1).attachSingleTile(getChunk(chunk3), 3, 0, 10, (36/2));
+		BasicDungeon dungeon = new BasicDungeon(world);
+		dungeon.someshit();
 		
 		//creatureBuilder.sphere(64+32, 16, 16, 20.0f);
 		
@@ -131,7 +161,7 @@ public class WorldManager {
 
 	}
 
-	void setRenderingPerspective(int e) {
+	public void setRenderingPerspective(int e) {
 		// world.getSystem(CharacterRenderingSystem.class).perspective = e;
 		// world.getSystem(ItemRenderingSystem.class).perspective = e;
 		if (world.getSystem(TileRenderingSystem.class)==null) return;
@@ -171,7 +201,7 @@ public class WorldManager {
 		return chunk.worldID;
 	}
 
-	void setActiveChunk(int i) {
+	public void setActiveChunk(int i) {
 		if (i < 0 || i >= chunkList.size())
 			return;
 		activeChunk = i;
@@ -194,6 +224,7 @@ public class WorldManager {
 		for (Chunk chunk : newChunk.neighbors) {
 			chunk.load();
 		}
+		//System.out.println("SHIFT!!");
 	}
 
 	public Chunk getChunk(int i) {
@@ -213,6 +244,12 @@ public class WorldManager {
 			return null;
 		}
 	}
+	
+	@Subscribe
+	void CameraShiftListener(CameraShift event) {
+		triggerTileRedraw();
+		//FFMain.sendMessage(event.dx + ", " + event.dy);
+	}
 
 	void process() { 
 		//OOPS! the order this queue goes in isn't the order that entities are processed by the ECS!!!!
@@ -220,60 +257,10 @@ public class WorldManager {
 		TimeSystem timeSystem = world.getSystem(TimeSystem.class);
 		int actorsPerUpdate = timeSystem.getNumActors();
 		for (int i = 0; i < actorsPerUpdate; i++) { // ACTORS PROPOSE ACTIONS
-			if (!timeSystem.tick())
+			if (!timeSystem.tick(i))
 				break;
 		}
 		world.process();
-	}
-
-	void loadTestWorld(Chunk chunk) {
-		Random r = new Random();
-		int numRocks = 0;
-		for (int i = 0; i < numRocks; i++) { // make boulders
-			int q = r.nextInt(chunk.width * chunk.height);
-			int e = chunk.tiles[q];
-			Tile tile = mTile.create(e);
-			Char character = mChar.create(e);
-			tile.solid = true;
-			character.character = '0';
-			character.fgc = TextColor.ANSI.DEFAULT.ordinal();
-		}
-
-		creatureBuilder.player(chunk, 3, 3);
-		setRenderingPerspective(FFMain.playerID);
-		creatureBuilder.camera(FFMain.playerID, 0, 0, 64, 32, 14);
-		int numGoblins = 3;
-		for (int i = 0; i < numGoblins; i++) {
-			creatureBuilder.goblin(chunk, r.nextInt(chunk.width), r.nextInt(chunk.height));
-		}
-
-		// itemBuilder.createTest(chunk, 12, 6);
-		// itemBuilder.createTest(chunk, 12, 6);
-		// itemBuilder.createTest(chunk, 12, 6);
-
-		// creatureBuilder.sphere(64+32, 16);
-	}
-	
-	void loadTest2(Chunk chunk) {
-		chunk.setGroundColor(TextColor.ANSI.YELLOW.ordinal());
-		Random r = new Random();
-		int numRocks = 0;
-		for (int i = 0; i < numRocks; i++) { // make boulders
-			int q = r.nextInt(chunk.width * chunk.height);
-			int e = chunk.tiles[q];
-			Tile tile = mTile.create(e);
-			Char character = mChar.create(e);
-			tile.solid = true;
-			character.character = '0';
-			character.fgc = TextColor.ANSI.RED.ordinal();
-		}
-
-		int numGoblins = 3;
-		for (int i = 0; i < numGoblins; i++) {
-			creatureBuilder.goblin(chunk, r.nextInt(chunk.width), r.nextInt(chunk.height));
-		}
-		
-		// itemBuilder.createTest(chunk, 12, 6);
 	}
 
 	void generateTest() {
@@ -460,6 +447,8 @@ public class WorldManager {
 		//int lastY = y0;
 		//if (line.length <= 2) return true; //very short line
 		//screen.setCharacter(x0, y0, new TextCharacter('@', TextColor.ANSI.CYAN, TextColor.ANSI.RED));
+		int solidHits = 0;
+		
 		for (int i = 2; i < line.length; i += 2) {
 			int x = line[i];
 			int y = line[i + 1];
@@ -506,8 +495,14 @@ public class WorldManager {
 			//if (!((x == x0 && y == y0) || (x == x1 && y == y1))) {
 			if (!((x == x0 && y == y0) || (x == x1 && y == y1))) {
 				if (newTile.solid) {
+					//FFMain.sendMessage(d.x + ", " + d.y);
+					//System.out.println(x+", "+y);
 					//screen.setCharacter(x, y, new TextCharacter('X', TextColor.ANSI.CYAN, TextColor.ANSI.RED));
-					return false;
+					if (solidHits >= 0) { //eh
+						return false;
+					} else {
+						solidHits++;
+					}
 				}
 			}
 		}

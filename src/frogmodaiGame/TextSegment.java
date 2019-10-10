@@ -11,7 +11,13 @@ public class TextSegment {
 	
 	public TextSegment(String s) {
 		text = s;
-		foreground = TextColor.ANSI.WHITE;
+		foreground = TextColor.ANSI.DEFAULT;
+		background = TextColor.ANSI.BLACK;
+	}
+	
+	public TextSegment(String s, TextColor.ANSI fg) {
+		text = s;
+		foreground = fg;
 		background = TextColor.ANSI.BLACK;
 	}
 	

@@ -13,10 +13,12 @@ import frogmodaiGame.components.*;
 public enum DecisionBehaviors {
 	PlayerMove(new Function<Integer, Integer>() {
 		ComponentMapper<VirtualController> mVirtualController;
+		ComponentMapper<TimedActor> mTimedActor;
 
 		public Integer apply(Integer e) {
 			KeyStroke keystroke = FFMain.keystroke;
 			VirtualController virtualController = mVirtualController.create(e);
+			TimedActor timedActor = mTimedActor.create(e);
 			int MOVE_COST = -1; //The default is to wait another cycle
 			//Until pre-requisites are met
 			//TODO: Other actors having limited number of cycles to make a decision???
@@ -47,20 +49,20 @@ public enum DecisionBehaviors {
 					moving = false;
 				}
 				if (moving) {
-					MOVE_COST = (int) (TimedActor.TICK_ENERGY * 0.9); // moving should take a majority of your energy
+					MOVE_COST = (int) (timedActor.speed * 1.0f); // moving should take a majority of your energy
 				}
 				
 				if (keytype == KeyType.Character) {
 					char c = keystroke.getCharacter();
 					if (c == 'p') {
 						virtualController.addAction(new PickupCommand());
-						MOVE_COST = (int) (TimedActor.TICK_ENERGY * -0.1);
+						MOVE_COST = (int) (timedActor.speed * -0.1f);
 						//Pause to open menu
 						//Except I don't want to add the menu yet, just checking the local tile for objects
 					}
 					if (c == 'd') {
 						virtualController.addAction(new DropCommand());
-						MOVE_COST = (int) (TimedActor.TICK_ENERGY * -0.1);
+						MOVE_COST = (int) (timedActor.speed * -0.1f);
 						//Pause to open menu
 						//Except I don't want to add the menu yet, just checking the local tile for objects
 					}
@@ -75,10 +77,12 @@ public enum DecisionBehaviors {
 
 	GoblinMove(new Function<Integer, Integer>() {
 		ComponentMapper<VirtualController> mVirtualController;
+		ComponentMapper<TimedActor> mTimedActor;
 
 		public Integer apply(Integer e) {
 			// KeyStroke keystroke = FFMain.keystroke;
 			VirtualController virtualController = mVirtualController.create(e);
+			TimedActor timedActor = mTimedActor.create(e);
 			int MOVE_COST = -1;
 
 			// virtualController.moveX = 0.0f;
@@ -106,9 +110,10 @@ public enum DecisionBehaviors {
 				virtualController.addAction(new MoveCommand(1, -1));
 			} else {
 				moving = false;
+				MOVE_COST = 1;
 			}
 			if (moving) {
-				MOVE_COST = (int) (TimedActor.TICK_ENERGY * 0.9); // goblin should move ridiculously fast
+				MOVE_COST = (int) (timedActor.speed * 1.0f); // goblin should move ridiculously fast
 			}
 			// FFMain.keystroke = null; //KEYSTROKES SHOULD NOT COUNT MORE THAN ONCE
 			// }

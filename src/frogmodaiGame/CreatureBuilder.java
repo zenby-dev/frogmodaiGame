@@ -9,6 +9,7 @@ import com.googlecode.lanterna.input.KeyType;
 
 import frogmodaiGame.behaviors.*;
 import frogmodaiGame.components.*;
+import net.mostlyoriginal.api.event.common.EventSystem;
 
 public class CreatureBuilder {
 
@@ -22,6 +23,9 @@ public class CreatureBuilder {
 	ComponentMapper<SphereInfo> mSphereInfo;
 	ComponentMapper<OnTouch> mOnTouch;
 	ComponentMapper<OnTouched> mOnTouched;
+	ComponentMapper<StatHP> mStatHP;
+	
+	EventSystem es;
 
 	CreatureBuilder(World world) {
 		world.inject(this);
@@ -108,6 +112,10 @@ public class CreatureBuilder {
 		character.fgc = 6;
 		character.bold = false;
 		
+		StatHP statHP = mStatHP.create(gob);
+		statHP.setMaxValue(3, true);
+		es.registerEvents(statHP);
+		
 		ChunkAddress chunkAddress = mChunkAddress.create(gob);
 		chunkAddress.worldID = chunk.worldID;
 		
@@ -116,6 +124,7 @@ public class CreatureBuilder {
 		actor.energy = actor.speed;
 		actor.act = DecisionBehaviors.GoblinMove.act;
 		FFMain.worldManager.world.inject(actor.act); // required!!!
+		es.registerEvents(actor.act);
 		
 		Description desc = mDescription.create(gob);
 		desc.name = "Goblin";
@@ -123,10 +132,12 @@ public class CreatureBuilder {
 		OnTouch onTouch = mOnTouch.create(gob);
 		onTouch.act = TouchBehaviors.GoblinTouch.act;
 		FFMain.worldManager.world.inject(onTouch.act);
+		es.registerEvents(onTouch.act);
 		
 		OnTouched onTouched = mOnTouched.create(gob);
 		onTouched.act = TouchedBehaviors.GoblinTouched.act;
 		FFMain.worldManager.world.inject(onTouched.act);
+		es.registerEvents(onTouched.act);
 		
 		return gob;
 	}

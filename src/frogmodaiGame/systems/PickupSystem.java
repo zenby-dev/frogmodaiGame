@@ -57,6 +57,7 @@ public class PickupSystem extends IteratingSystem {
 			return;
 		}
 		
+		//MODAL TIME!!!
 		FFMain.worldManager.uiHelper.Pickup(e, entities); //FORMS ARE BLOCKING YAY
 	}
 

@@ -16,6 +16,10 @@ public class Paragraph {
 		add(new TextSegment(s));
 	}
 	
+	public void add(String s, TextColor.ANSI fg) {
+		add(new TextSegment(s, fg));
+	}
+	
 	public void add(String s, TextColor.ANSI fg, TextColor.ANSI bg) {
 		add(new TextSegment(s, fg, bg));
 	}

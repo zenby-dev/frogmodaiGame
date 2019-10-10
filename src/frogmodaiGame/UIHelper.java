@@ -32,6 +32,7 @@ import frogmodaiGame.systems.*;
 
 public class UIHelper {
 	ComponentMapper<Description> mDescription;
+	boolean triggerRedraw = false;
 	
 	public UIHelper(World world) {
 		world.inject(this);
@@ -57,6 +58,8 @@ public class UIHelper {
 	
 	public void Pickup(int entity, ArrayList<Integer> entities, int selected) {
 		if (entities.size() < 1) return;
+		
+		triggerRedraw = true;
 		
 		final Window window = new BasicWindow("Pick up items");
 		Panel contentPanel = new Panel(new GridLayout(2));
@@ -136,6 +139,8 @@ public class UIHelper {
 	
 	public void Drop(int entity, ArrayList<Integer> entities, int selected) {
 		if (entities.size() < 1) return;
+		
+		triggerRedraw = true;
 		
 		final Window window = new BasicWindow("Drop items");
 		Panel contentPanel = new Panel(new GridLayout(2));

@@ -27,7 +27,7 @@ public class TimeSystem extends IteratingSystem {
 		queue = new LinkedList<Integer>();
 	}
 	
-	public boolean tick() { //WHOLE SYSTEM
+	public boolean tick(int index) { //WHOLE SYSTEM
 		if (lockCount > 0)
 			return false;
 		
@@ -37,6 +37,8 @@ public class TimeSystem extends IteratingSystem {
 		} catch(NoSuchElementException e) {
 			return false;
 		}
+		
+		//System.out.printf("%d %d\n", index, a);
 		
 		TimedActor actor = mTimedActor.create(a);
 		while (actor.energy > 0 && !actor.isFrozen) {
