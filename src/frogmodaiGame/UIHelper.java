@@ -28,11 +28,15 @@ import com.googlecode.lanterna.input.KeyStroke;
 import com.googlecode.lanterna.input.KeyType;
 
 import frogmodaiGame.components.*;
+import frogmodaiGame.events.ScreenRefreshRequest;
 import frogmodaiGame.systems.*;
+import net.mostlyoriginal.api.event.common.EventSystem;
 
 public class UIHelper {
 	ComponentMapper<Description> mDescription;
 	boolean triggerRedraw = false;
+	
+	EventSystem es;
 	
 	public UIHelper(World world) {
 		world.inject(this);
@@ -59,7 +63,8 @@ public class UIHelper {
 	public void Pickup(int entity, ArrayList<Integer> entities, int selected) {
 		if (entities.size() < 1) return;
 		
-		triggerRedraw = true;
+		//triggerRedraw = true;
+		es.dispatch(new ScreenRefreshRequest());
 		
 		final Window window = new BasicWindow("Pick up items");
 		Panel contentPanel = new Panel(new GridLayout(2));
@@ -140,7 +145,8 @@ public class UIHelper {
 	public void Drop(int entity, ArrayList<Integer> entities, int selected) {
 		if (entities.size() < 1) return;
 		
-		triggerRedraw = true;
+		//triggerRedraw = true;
+		es.dispatch(new ScreenRefreshRequest());
 		
 		final Window window = new BasicWindow("Drop items");
 		Panel contentPanel = new Panel(new GridLayout(2));

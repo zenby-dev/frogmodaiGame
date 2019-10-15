@@ -1,10 +1,17 @@
 package frogmodaiGame.events;
 
 import frogmodaiGame.CancellableEvent;
+import frogmodaiGame.FFMain;
 import net.mostlyoriginal.api.event.common.Cancellable;
 import net.mostlyoriginal.api.event.common.Event;
 
 public class ChangeStat {
+	public static void run(String name, int entity, int amount) {
+		FFMain.worldManager.runEventSet(new ChangeStat.Before(name, entity, amount),
+				new ChangeStat.During(name, entity, amount),
+				new ChangeStat.After(name, entity, amount));
+	}
+	
 	public static class Before extends CancellableEvent {
 		public String name;
 		public int entity;

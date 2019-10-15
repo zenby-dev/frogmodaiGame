@@ -55,7 +55,7 @@ public class StatSystem extends IteratingSystem {
 	@Subscribe(ignoreCancelledEvents = true)
 	public void DuringChangeStatListener(ChangeStat.During event) {
 		Stat stat = mStat.get(event.entity);
-		FFMain.sendMessage("OW!");
+		//FFMain.sendMessage("OW!");
 		stat.changeValue(event.amount);
 	}
 

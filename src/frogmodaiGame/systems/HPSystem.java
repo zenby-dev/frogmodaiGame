@@ -45,14 +45,14 @@ public class HPSystem extends IteratingSystem {
 	@Subscribe(ignoreCancelledEvents = true)
 	public void DuringChangeStatListener(ChangeStat.During event) {
 		StatHP statHP = mStatHP.get(event.entity);
-		FFMain.sendMessage("OW!");
+		//FFMain.sendMessage("OW!");
 		statHP.changeValue(event.amount);
 	}
 
 	@Subscribe
 	public void AfterChangeStatListener(ChangeStat.After event) {
 		StatHP statHP = mStatHP.get(event.entity);
-		System.out.println(statHP.currentValue);
+		//System.out.println(statHP.currentValue);
 		if (statHP.currentValue < 1) {
 			/*HPAtZero.Before before = new HPAtZero.Before(event.entity);
 			es.dispatch(before);
@@ -64,9 +64,7 @@ public class HPSystem extends IteratingSystem {
 					es.dispatch(after);
 				}
 			}*/
-			FFMain.worldManager.runEventSet(new HPAtZero.Before(event.entity),
-					new HPAtZero.During(event.entity),
-					new HPAtZero.After(event.entity));
+			HPAtZero.run(event.entity);
 		}
 	}
 	
@@ -84,7 +82,7 @@ public class HPSystem extends IteratingSystem {
 	public void AfterHPAtZero(HPAtZero.After event) {
 		//TRIGGER DEATH!!
 		es.dispatch(new ActorDied(event.entity));
-		FFMain.sendMessage("GAAAAAAAAAAHH!!!!");
+		//FFMain.sendMessage("GAAAAAAAAAAHH!!!!");
 		//FFMain.worldManager.world.delete(event.entity);
 	}
 }

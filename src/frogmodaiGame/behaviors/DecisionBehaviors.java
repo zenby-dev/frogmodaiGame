@@ -9,11 +9,16 @@ import com.googlecode.lanterna.input.KeyType;
 import frogmodaiGame.*;
 import frogmodaiGame.commands.*;
 import frogmodaiGame.components.*;
+import frogmodaiGame.events.MoveAttempt;
+import frogmodaiGame.events.ScreenRefreshRequest;
+import net.mostlyoriginal.api.event.common.EventSystem;
 
 public enum DecisionBehaviors {
 	PlayerMove(new Function<Integer, Integer>() {
 		ComponentMapper<VirtualController> mVirtualController;
 		ComponentMapper<TimedActor> mTimedActor;
+		
+		EventSystem es;
 
 		public Integer apply(Integer e) {
 			KeyStroke keystroke = FFMain.keystroke;
@@ -30,26 +35,36 @@ public enum DecisionBehaviors {
 				KeyType keytype = keystroke.getKeyType();
 				boolean moving = true;
 				if (keytype == KeyType.ArrowRight)
-					virtualController.addAction(new MoveCommand(1, 0));
+					MoveAttempt.run(e, 1, 0);
+					//virtualController.addAction(new MoveCommand(1, 0));
 				else if (keytype == KeyType.ArrowLeft)
-					virtualController.addAction(new MoveCommand(-1, 0));
+					MoveAttempt.run(e, -1, 0);
+					//virtualController.addAction(new MoveCommand(-1, 0));
 				else if (keytype == KeyType.ArrowUp)
-					virtualController.addAction(new MoveCommand(0, -1));
+					MoveAttempt.run(e, 0, -1);
+					//virtualController.addAction(new MoveCommand(0, -1));
 				else if (keytype == KeyType.ArrowDown)
-					virtualController.addAction(new MoveCommand(0, 1));
+					MoveAttempt.run(e, 0, 1);
+					//virtualController.addAction(new MoveCommand(0, 1));
 				else if (keytype == KeyType.Character && keystroke.getCharacter() == '1') {
-					virtualController.addAction(new MoveCommand(-1, 1));
+					MoveAttempt.run(e, -1, 1);
+					//virtualController.addAction(new MoveCommand(-1, 1));
 				} else if (keytype == KeyType.Character && keystroke.getCharacter() == '3') {
-					virtualController.addAction(new MoveCommand(1, 1));
+					MoveAttempt.run(e, 1, 1);
+					//virtualController.addAction(new MoveCommand(1, 1));
 				} else if (keytype == KeyType.Character && keystroke.getCharacter() == '7') {
-					virtualController.addAction(new MoveCommand(-1, -1));
+					MoveAttempt.run(e, -1, -1);
+					//virtualController.addAction(new MoveCommand(-1, -1));
 				} else if (keytype == KeyType.Character && keystroke.getCharacter() == '9') {
-					virtualController.addAction(new MoveCommand(1, -1));
+					MoveAttempt.run(e, 1, -1);
+					//virtualController.addAction(new MoveCommand(1, -1));
 				} else {
 					moving = false;
 				}
 				if (moving) {
 					MOVE_COST = (int) (timedActor.speed * 1.0f); // moving should take a majority of your energy
+					//I guess just send a draw request every time the player's turn ends???
+					es.dispatch(new ScreenRefreshRequest());
 				}
 				
 				if (keytype == KeyType.Character) {
@@ -93,21 +108,29 @@ public enum DecisionBehaviors {
 			boolean moving = true;
 			int r = FFMain.random.nextInt(9);
 			if (r == 0)
-				virtualController.addAction(new MoveCommand(1, 0));
+				MoveAttempt.run(e, 1, 0);
+				//virtualController.addAction(new MoveCommand(1, 0));
 			else if (r == 1)
-				virtualController.addAction(new MoveCommand(-1, 0));
+				MoveAttempt.run(e, -1, 0);
+				//virtualController.addAction(new MoveCommand(-1, 0));
 			else if (r == 2)
-				virtualController.addAction(new MoveCommand(0, -1));
+				MoveAttempt.run(e, 0, -1);
+				//virtualController.addAction(new MoveCommand(0, -1));
 			else if (r == 3)
-				virtualController.addAction(new MoveCommand(0, 1));
+				MoveAttempt.run(e, 0, 1);
+				//virtualController.addAction(new MoveCommand(0, 1));
 			else if (r == 4) {
-				virtualController.addAction(new MoveCommand(-1, 1));
+				MoveAttempt.run(e, -1, 1);
+				//virtualController.addAction(new MoveCommand(-1, 1));
 			} else if (r == 5) {
-				virtualController.addAction(new MoveCommand(1, 1));
+				MoveAttempt.run(e, 1, 1);
+				//virtualController.addAction(new MoveCommand(1, 1));
 			} else if (r == 6) {
-				virtualController.addAction(new MoveCommand(-1, -1));
+				MoveAttempt.run(e, -1, -1);
+				//virtualController.addAction(new MoveCommand(-1, -1));
 			} else if (r == 7) {
-				virtualController.addAction(new MoveCommand(1, -1));
+				MoveAttempt.run(e, 1, -1);
+				//virtualController.addAction(new MoveCommand(1, -1));
 			} else {
 				moving = false;
 				MOVE_COST = 1;

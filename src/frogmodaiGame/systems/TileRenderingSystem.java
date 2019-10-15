@@ -33,6 +33,7 @@ public class TileRenderingSystem extends IteratingSystem { // This is for terrai
 	ComponentMapper<Sight> mSight;
 	ComponentMapper<IsItem> mIsItem;
 	ComponentMapper<TimedActor> mTimedActor;
+	ComponentMapper<IsDead> mIsDead;
 
 	Screen screen;
 	@EntityId
@@ -302,7 +303,7 @@ public class TileRenderingSystem extends IteratingSystem { // This is for terrai
 
 		int winner = -1;
 		for (int e : tile.entitiesHere) {
-			if (mChar.has(e)) { // don't bother with anything that doesn't draw a character
+			if (mChar.has(e) && !mIsDead.has(e)) { // don't bother with anything that doesn't draw a character
 				if (winner == -1)
 					winner = e;
 				else {
@@ -316,6 +317,8 @@ public class TileRenderingSystem extends IteratingSystem { // This is for terrai
 
 		if (winner == -1)
 			return false;
+		
+		//System.out.println(winner + ", " + mChar.get(winner).character + ", " + mIsDead.has(winner));
 
 		TextCharacter ct = mChar.get(winner).getTextCharacter();
 		buffer.setCharacterAt(pos.x, pos.y, ct.withBackgroundColor(TextColor.ANSI.values()[tileChar.bgc]));

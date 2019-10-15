@@ -14,6 +14,7 @@ import frogmodaiGame.components.*;
 public class TimeSystem extends IteratingSystem {
 
 	ComponentMapper<TimedActor> mTimedActor;
+	ComponentMapper<IsDead> mIsDead;
 	
 	int ticks = 0;
 	
@@ -41,7 +42,7 @@ public class TimeSystem extends IteratingSystem {
 		//System.out.printf("%d %d\n", index, a);
 		
 		TimedActor actor = mTimedActor.create(a);
-		while (actor.energy > 0 && !actor.isFrozen) {
+		while (actor.energy > 0 && !actor.isFrozen && !mIsDead.has(a)) {
 			currentActor = a;
 			int actionCost = actor.act.apply(a); // THIS WHERE ACTOR DO
 			currentActor = -1;

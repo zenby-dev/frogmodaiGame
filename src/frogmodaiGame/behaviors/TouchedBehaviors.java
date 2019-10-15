@@ -57,9 +57,7 @@ public enum TouchedBehaviors {
 						es.dispatch(after);
 					}
 				}*/
-				FFMain.worldManager.runEventSet(new ChangeStat.Before("HP", e, -1),
-						new ChangeStat.During("HP", e, -1),
-						new ChangeStat.After("HP", e, -1));
+				ChangeStat.run("HP", e, -1);
 				//FFMain.sendMessage("    This method does the reverse of getColumnIndex, given a String and imagining it has been printed out to the top-left corner of a terminal, in the column specified by columnIndex, what is the index of that character in the string.");
 			}
 		}

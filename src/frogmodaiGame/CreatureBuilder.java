@@ -128,6 +128,7 @@ public class CreatureBuilder {
 		
 		Description desc = mDescription.create(gob);
 		desc.name = "Goblin";
+		desc.addDescription("A small greebly feller");
 		
 		OnTouch onTouch = mOnTouch.create(gob);
 		onTouch.act = TouchBehaviors.GoblinTouch.act;

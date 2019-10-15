@@ -21,6 +21,7 @@ import frogmodaiGame.components.*;
 import frogmodaiGame.events.CameraShift;
 import frogmodaiGame.events.ChangeStat;
 import frogmodaiGame.events.HPAtZero;
+import frogmodaiGame.events.ScreenRefreshRequest;
 import frogmodaiGame.generators.*;
 import frogmodaiGame.systems.*;
 import net.mostlyoriginal.api.event.common.Event;
@@ -35,6 +36,8 @@ public class WorldManager {
 	public ItemBuilder itemBuilder;
 	public UIHelper uiHelper;
 	public int activeChunk = -1;
+	
+	private boolean screenRefreshRequested = false;
 	//TileRenderingSystem tileRender;
 	Screen screen;
 	
@@ -66,9 +69,13 @@ public class WorldManager {
 				.dependsOn(EventSystem.class)
 				.with(
 						serialManager,
+						//Setup Phase
 						new TimeSystem(), 
 						//new TileRenderingSystem(_screen),
-						new CharacterMovingSystem(), 
+						
+						//Logic Phase
+						new CharacterMovingSystem(),
+						new MoveCollisionSystem(),
 						new CameraMovingSystem(),
 						new TileOccupationClearingSystem(), 
 						new TileOccupationSystem(), 
@@ -76,10 +83,16 @@ public class WorldManager {
 						new DropSystem(), 
 						new ItemRelocatingSystem(), 
 						new HPSystem(),
+						new DeathSystem1(),
+						
+						//Rendering Phase
 						new DescriptiveTextSystem(_screen),
 						new TileRenderingSystem(_screen),
 						new PositionGhostSystem(_screen), 
-						new SphereRenderingSystem(_screen))
+						new SphereRenderingSystem(_screen),
+						
+						//Post-Rendering Phase
+						new DeathSystem2())
 				.build();
 		world = new World(config);
 		world.inject(this);
@@ -98,6 +111,7 @@ public class WorldManager {
 	
 	public void registerAllEvents() {
 		registerEvents(this);
+		//registerEvents(uiHelper);
 	}
 	
 	public void runEventSet(CancellableEvent _before, CancellableEvent _during, Event _after) {
@@ -114,11 +128,18 @@ public class WorldManager {
 		}
 	}
 	
+	@Subscribe
+	public void ScreenRefreshRequestListener(ScreenRefreshRequest event) {
+		screenRefreshRequested = true;
+		world.getSystem(TileRenderingSystem.class).triggerRedraw();
+		world.getSystem(DescriptiveTextSystem.class).triggerRedraw();
+	}
+	
 	public boolean refreshNeeded() {
-		if (uiHelper.triggerRedraw) {
-			uiHelper.triggerRedraw = false;
-			world.getSystem(TileRenderingSystem.class).triggerRedraw();
-			world.getSystem(DescriptiveTextSystem.class).triggerRedraw();
+		if (screenRefreshRequested) {
+			screenRefreshRequested = false;
+			//world.getSystem(TileRenderingSystem.class).triggerRedraw();
+			//world.getSystem(DescriptiveTextSystem.class).triggerRedraw();
 			return true;
 		}
 		if (		world.getSystem(TileRenderingSystem.class).drewThisFrame ||

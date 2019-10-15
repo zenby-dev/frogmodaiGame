@@ -28,6 +28,10 @@ public enum TouchBehaviors {
 				for (int o : tile.entitiesHere) {
 					Description desc = mDescription.create(o);
 					
+					//TODO: Check if this is something we should be doing some activation method on,
+					//	or if it's something we should be hitting (faction system?)
+					//TODO: Send an event to try to hit the goblin/object (that gives them a chance to dodge)
+					
 					//FFMain.sendMessage(desc.name + ": " + desc.getDescription());
 					//FFMain.sendMessage("    This method does the reverse of getColumnIndex, given a String and imagining it has been printed out to the top-left corner of a terminal, in the column specified by columnIndex, what is the index of that character in the string.");
 					//System.out.println(desc.name);
