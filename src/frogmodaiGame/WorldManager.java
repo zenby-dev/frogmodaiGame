@@ -72,8 +72,13 @@ public class WorldManager {
 						//Setup Phase
 						new TimeSystem(), 
 						//new TileRenderingSystem(_screen),
+						new VisionSystem(),
 						
-						//Logic Phase
+						//Behavior Systems (mostly event driven ie. not in order)
+						new PlayerSystem(),
+						new GoblinSystem(),
+						
+						//Logic Phase ??? (non-event driven ie. in order)
 						new CharacterMovingSystem(),
 						new MoveCollisionSystem(),
 						new CameraMovingSystem(),
@@ -103,6 +108,18 @@ public class WorldManager {
 		registerAllEvents();
 		
 		screen = _screen;
+	}
+	
+	void process() { 
+		//OOPS! the order this queue goes in isn't the order that entities are processed by the ECS!!!!
+		getActiveChunk().update();
+		TimeSystem timeSystem = world.getSystem(TimeSystem.class);
+		int actorsPerUpdate = timeSystem.getNumActors();
+		for (int i = 0; i < actorsPerUpdate; i++) { // ACTORS PROPOSE ACTIONS
+			if (!timeSystem.tick(i))
+				break;
+		}
+		world.process();
 	}
 	
 	public void registerEvents(Object a) {
@@ -270,18 +287,6 @@ public class WorldManager {
 	void CameraShiftListener(CameraShift event) {
 		triggerTileRedraw();
 		//FFMain.sendMessage(event.dx + ", " + event.dy);
-	}
-
-	void process() { 
-		//OOPS! the order this queue goes in isn't the order that entities are processed by the ECS!!!!
-		getActiveChunk().update();
-		TimeSystem timeSystem = world.getSystem(TimeSystem.class);
-		int actorsPerUpdate = timeSystem.getNumActors();
-		for (int i = 0; i < actorsPerUpdate; i++) { // ACTORS PROPOSE ACTIONS
-			if (!timeSystem.tick(i))
-				break;
-		}
-		world.process();
 	}
 
 	void generateTest() {

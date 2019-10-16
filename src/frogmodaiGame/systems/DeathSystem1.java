@@ -9,8 +9,10 @@ import com.artemis.Aspect.Builder;
 import com.artemis.BaseSystem;
 import com.artemis.ComponentMapper;
 import com.artemis.systems.IteratingSystem;
+import com.googlecode.lanterna.TextColor;
 
 import frogmodaiGame.FFMain;
+import frogmodaiGame.Paragraph;
 import frogmodaiGame.components.*;
 import frogmodaiGame.events.ActorDied;
 import frogmodaiGame.events.ChangeStat;
@@ -22,8 +24,9 @@ import net.mostlyoriginal.api.event.common.EventSystem;
 import net.mostlyoriginal.api.event.common.Subscribe;
 
 public class DeathSystem1 extends BaseSystem {
-	
+
 	ComponentMapper<IsDead> mIsDead;
+	ComponentMapper<Description> mDesc;
 
 	EventSystem es;
 
@@ -36,21 +39,34 @@ public class DeathSystem1 extends BaseSystem {
 	protected void processSystem() {
 
 	}
-	
+
 	@Subscribe
 	public void ActorDiedListener(ActorDied event) {
-		//Turn into corpse or something
-		//The easiest and least flexible answer is every creature drops the same "corpse" item
-		//The second easiest is to create an item that pulls some general attributes from the creature if they're there
-		//Another option is for entities to have components that carry info about what should happen upon their death??
-		//Removing components directly from the entity to reduce it down to just the ones for a corpse would 
-		//	require knowing what components they have (bad idea)
-		//FFMain.worldManager.world.delete(event.entity);
+		// Turn into corpse or something
+		// The easiest and least flexible answer is every creature drops the same
+		// "corpse" item
+		// The second easiest is to create an item that pulls some general attributes
+		// from the creature if they're there
+		// Another option is for entities to have components that carry info about what
+		// should happen upon their death??
+		// Removing components directly from the entity to reduce it down to just the
+		// ones for a corpse would
+		// require knowing what components they have (bad idea)
+		// FFMain.worldManager.world.delete(event.entity);
 		mIsDead.create(event.entity);
-		FFMain.sendMessage("Entity " + event.entity + " has died");
+
+		if (mDesc.has(event.entity)) {
+			Description desc = mDesc.get(event.entity);
+			Paragraph para = new Paragraph();
+			para.add("You killed a ");
+			para.add(desc.name, TextColor.ANSI.RED);
+			para.add("!");
+			FFMain.sendMessage(para);
+		}
+
 		es.dispatch(new ScreenRefreshRequest());
 	}
-	
+
 }
 
 /*

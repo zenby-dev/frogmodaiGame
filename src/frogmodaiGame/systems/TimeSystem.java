@@ -10,11 +10,15 @@ import com.artemis.ComponentMapper;
 import com.artemis.systems.IteratingSystem;
 
 import frogmodaiGame.components.*;
+import frogmodaiGame.events.ActorTakeTurn;
+import net.mostlyoriginal.api.event.common.EventSystem;
 
 public class TimeSystem extends IteratingSystem {
 
 	ComponentMapper<TimedActor> mTimedActor;
 	ComponentMapper<IsDead> mIsDead;
+	
+	EventSystem es;
 	
 	int ticks = 0;
 	
@@ -44,7 +48,11 @@ public class TimeSystem extends IteratingSystem {
 		TimedActor actor = mTimedActor.create(a);
 		while (actor.energy > 0 && !actor.isFrozen && !mIsDead.has(a)) {
 			currentActor = a;
-			int actionCost = actor.act.apply(a); // THIS WHERE ACTOR DO
+			ActorTakeTurn event = new ActorTakeTurn(a);
+			es.dispatch(event);
+			int actionCost = event.actionCost;
+			if (event.passing) actionCost = actor.energy;
+			//int actionCost = actor.act.apply(a); // THIS WHERE ACTOR DO
 			currentActor = -1;
 			
 			if (currentActorRemoved) {

@@ -24,6 +24,8 @@ public class CreatureBuilder {
 	ComponentMapper<OnTouch> mOnTouch;
 	ComponentMapper<OnTouched> mOnTouched;
 	ComponentMapper<StatHP> mStatHP;
+	ComponentMapper<IsFaction> mIsFaction;
+	ComponentMapper<IsGoblin> mIsGoblin;
 	
 	EventSystem es;
 
@@ -106,6 +108,11 @@ public class CreatureBuilder {
 		Position pos = mPosition.create(gob);
 		pos.x = x;
 		pos.y = y;
+		
+		IsFaction faction = mIsFaction.create(gob);
+		faction.name = "MONSTERS";
+		
+		mIsGoblin.create(gob);
 		
 		Char character = mChar.create(gob);
 		character.character = 'g';

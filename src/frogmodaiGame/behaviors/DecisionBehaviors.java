@@ -21,7 +21,7 @@ public enum DecisionBehaviors {
 		EventSystem es;
 
 		public Integer apply(Integer e) {
-			KeyStroke keystroke = FFMain.keystroke;
+			/*KeyStroke keystroke = FFMain.keystroke;
 			VirtualController virtualController = mVirtualController.create(e);
 			TimedActor timedActor = mTimedActor.create(e);
 			int MOVE_COST = -1; //The default is to wait another cycle
@@ -86,7 +86,8 @@ public enum DecisionBehaviors {
 				FFMain.keystroke = null; // KEYSTROKES SHOULD NOT COUNT MORE THAN ONCE
 			}
 
-			return MOVE_COST;
+			return MOVE_COST;*/
+			return 0;
 		}
 	}),
 
@@ -96,7 +97,7 @@ public enum DecisionBehaviors {
 
 		public Integer apply(Integer e) {
 			// KeyStroke keystroke = FFMain.keystroke;
-			VirtualController virtualController = mVirtualController.create(e);
+			/*VirtualController virtualController = mVirtualController.create(e);
 			TimedActor timedActor = mTimedActor.create(e);
 			int MOVE_COST = -1;
 
@@ -143,7 +144,8 @@ public enum DecisionBehaviors {
 
 			// System.out.println(String.format("@%d %d", e, MOVE_COST));
 
-			return MOVE_COST;
+			return MOVE_COST;*/
+			return 0;
 		}
 	});
 

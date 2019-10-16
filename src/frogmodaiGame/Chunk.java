@@ -129,7 +129,7 @@ public class Chunk { // SHOULD NOT CONTAIN ANY GENERATION CODE
 	//Swap in multiplicities with shorter path length.
 	//use this as final list of points, as it will only contain shortest paths.
 	
-	public void floodGrab(Position startPos, RelativePosition rel, int d, int e, final HashMap<String, RelativePosition> list) {
+	public void floodGrab(Position startPos, int d, final HashMap<String, RelativePosition> list) {
 		//"list" is the final list of included RelativePositions.
 		//"touched" is all RelativePositions that have already been explored.
 		//"todo" is the list of all neighbors flagged for checking on the previous cycle.
@@ -138,6 +138,12 @@ public class Chunk { // SHOULD NOT CONTAIN ANY GENERATION CODE
 		ArrayList<RelativePosition> newTodo = new ArrayList<RelativePosition>();
 		Random random = new Random();
 		
+		RelativePosition rel = new RelativePosition();
+		rel.x = startPos.x;
+		rel.y = startPos.y;
+		rel.e = getTile(startPos.x, startPos.y);
+		int e = rel.e;
+		
 		todo.add(rel);
 		
 		float depth = 0;
@@ -145,6 +151,7 @@ public class Chunk { // SHOULD NOT CONTAIN ANY GENERATION CODE
 		//screen.clear();
 		
 		while(todo.size() > 0) {
+			//System.out.println(todo.size());
 			//Pop a random element of todo.
 			int r = random.nextInt(todo.size());
 			RelativePosition randPos = todo.get(r);
@@ -159,13 +166,16 @@ public class Chunk { // SHOULD NOT CONTAIN ANY GENERATION CODE
 		
 		list.clear();
 		for (RelativePosition p : touched.values()) {
-			if (p.withinDistance(startPos, d))
+			if (p.withinDistance(startPos, d)) {
 				//System.out.println((p.x-startPos.x)+"|"+(p.y-startPos.y));
 				//System.out.println((p.x)+"|"+(p.y));
 				//list.put(p.x+"|"+p.y, p);
 				//p.x -= startPos.x;
 				//p.y -= startPos.y;
-				list.put(p.x+"|"+p.y, p);
+				list.put(p.toString(), p);
+			} else {
+				//RelativePosition.dispose(p);
+			}
 		}
 	}
 
@@ -203,6 +213,9 @@ public class Chunk { // SHOULD NOT CONTAIN ANY GENERATION CODE
 		for (int i = 0; i < 8; i++) {
 			int j = tile.neighbors[i];
 			RelativePosition newrel = new RelativePosition();
+			
+			//if (newrel == null) continue; //HACKY SHIT
+			
 			Position dir = DirectionConverter.toPosition(i);
 			newrel.x = rel.x + dir.x;
 			newrel.y = rel.y + dir.y;
@@ -210,20 +223,25 @@ public class Chunk { // SHOULD NOT CONTAIN ANY GENERATION CODE
 			newrel.dy = dir.y;
 			newrel.pathLength = rel.pathLength + ((Math.abs(rel.dx) == 1 && Math.abs(rel.dy) == 1) ? (float)Math.sqrt(2.0) : 1f);
 			newrel.e = j;
+			//System.out.printf("1: %d %d %d\n", newrel.x, newrel.y, newrel.e);
 			//Flooding stops locally when a tile with the same relative position has already been touched.
 			if (j != -1 && (!touched.containsKey(newrel.x + "|" + newrel.y) 
 					|| touched.get(newrel.x + "|" + newrel.y).pathLength > newrel.pathLength)) {// !list.contains((Integer) j)) {
+				//System.out.println("hm");
 				neighbors.add(i); // neighbors is a direction! not entID!!!
 				touched.put(newrel.x + "|" + newrel.y, newrel);
 			}
+			//System.out.println("bye " + i);
 		}
+		
+		//System.out.println("oi");
 		
 		//If this was to be breadth-first, I might collect all the bundles in a "final Queue"
 		//And then surrender back to top-level function
 		//Top-level empties current todo-list, and in turn fills a new todo-list
 		//Boundary conditions of "no repeats" and "max distance" will prevent addition to todo-list
 		//When the new todo-list has 0 length after the old todo-list is completed, return final list
-		
+
 		while (neighbors.size() > 0) {
 			int r = random.nextInt(neighbors.size());
 			int i = neighbors.get(r); // direction
@@ -231,6 +249,7 @@ public class Chunk { // SHOULD NOT CONTAIN ANY GENERATION CODE
 			if (j == -1) continue;
 			neighbors.remove(r);
 			RelativePosition newrel = new RelativePosition();
+			//System.out.printf("2: %d %d %d\n", newrel.x, newrel.y, newrel.e);
 			Position dir = DirectionConverter.toPosition(i);
 			newrel.x = rel.x + dir.x;
 			newrel.y = rel.y + dir.y;

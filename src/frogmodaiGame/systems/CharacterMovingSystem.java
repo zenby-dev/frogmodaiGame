@@ -28,6 +28,7 @@ public class CharacterMovingSystem extends BaseEntitySystem {
 	ComponentMapper<OnTouch> mOnTouch;
 	ComponentMapper<OnTouched> mOnTouched;
 	ComponentMapper<CameraWindow> mCameraWindow;
+	ComponentMapper<Sight> mSight;
 	// TODO: set player OnTile
 
 	EventSystem es;
@@ -213,6 +214,11 @@ public class CharacterMovingSystem extends BaseEntitySystem {
 		//System.out.println(event.entity + ", " + event.dx + ", " + event.dy);
 		boolean success = tryMove(event.entity, event.dx, event.dy);
 		if (!success) event.setCancelled(true);
+		if (success) {
+			if (mSight.has(event.entity)) {
+				mSight.get(event.entity).refreshNeeded = true;
+			}
+		}
 	}
 
 	@Override

@@ -25,6 +25,7 @@ import com.googlecode.lanterna.terminal.swing.AWTTerminal;
 import com.googlecode.lanterna.terminal.swing.AWTTerminalFrame;
 import com.googlecode.lanterna.terminal.swing.SwingTerminalFrame;
 
+import frogmodaiGame.components.RelativePosition;
 import frogmodaiGame.systems.DescriptiveTextSystem;
 
 public class FFMain {
@@ -82,6 +83,8 @@ public class FFMain {
 
 			// Initiate Archetypes
 			ArchetypeBuilders.initArchetypes();
+			
+			//RelativePosition.init(); //initialize pool
 
 			////////////////////////////////////////////
 			// ***THIS IS WHERE GAME START CODE GOES***//
@@ -131,14 +134,14 @@ public class FFMain {
 						&& (keystroke.getKeyType() == KeyType.Escape || keystroke.getKeyType() == KeyType.EOF)) {
 					break;
 				} else if (keystroke != null) {
-					HookManager.call("KeyPressed", (Object) keystroke);
+					//HookManager.call("KeyPressed", (Object) keystroke);
 				}
 
 				// Handle Resizing
 				TerminalSize newSize = screen.doResizeIfNecessary();
 				if (newSize != null) {
 					terminalSize = newSize;
-					HookManager.call("ScreenResized");
+					//HookManager.call("ScreenResized");
 				}
 				
 				worldManager.process();

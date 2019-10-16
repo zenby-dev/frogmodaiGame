@@ -26,7 +26,7 @@ public class BasicDungeon {
 	ArrayList<Integer> rooms;
 	char wallCharacter = '#';
 	int wallColor = TextColor.ANSI.DEFAULT.ordinal();
-	int numRooms = 20;
+	int numRooms = 10;
 	
 	int maxWidth = 12;
 	int maxHeight = 12;

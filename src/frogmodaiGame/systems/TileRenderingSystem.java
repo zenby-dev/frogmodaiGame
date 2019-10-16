@@ -41,41 +41,47 @@ public class TileRenderingSystem extends IteratingSystem { // This is for terrai
 	boolean fullRedraw = false;
 	TextCharacter emptyCharacter;
 	double PI = 3.14159265;
-	
+
 	public boolean drewThisFrame = false;
-	
+
 	ScreenBuffer buffer;
 
 	public TileRenderingSystem(Screen _screen) { // Matches camera, not tiles, for performance
 		super(Aspect.all(Position.class, CameraWindow.class));
 		screen = _screen;
-		System.out.printf("%d, %d\n", FFMain.screenWidth/2, FFMain.screenHeight);
-		buffer = new ScreenBuffer(new TerminalSize(FFMain.screenWidth/2, FFMain.screenHeight), new TextCharacter(' ', TextColor.ANSI.BLACK, TextColor.ANSI.BLACK));
-		//emptyCharacter = new TextCharacter('X', TextColor.ANSI.YELLOW, TextColor.ANSI.BLUE);
+		System.out.printf("%d, %d\n", FFMain.screenWidth / 2, FFMain.screenHeight);
+		buffer = new ScreenBuffer(new TerminalSize(FFMain.screenWidth / 2, FFMain.screenHeight),
+				new TextCharacter(' ', TextColor.ANSI.BLACK, TextColor.ANSI.BLACK));
+		// emptyCharacter = new TextCharacter('X', TextColor.ANSI.YELLOW,
+		// TextColor.ANSI.BLUE);
 		emptyCharacter = new TextCharacter(' ', TextColor.ANSI.BLACK, TextColor.ANSI.BLACK);
 	}
-	
+
 	public void triggerRedraw() {
 		fullRedraw = true;
 	}
 
 	@Override
-	protected void process(int e) { //this happens with high frequency
+	protected void process(int e) { // this happens with high frequency
+
+		if (!fullRedraw)
+			return;
+
 		drewThisFrame = false;
 		Position camPos = mPosition.create(e);
 		CameraWindow camWindow = mCameraWindow.create(e);
 		if (camWindow.focus == -1)
 			return;
-		Position focusPos = mPosition.create(camWindow.focus); //It's possible for focusPos to be from a different chunk than "chunk"
-		Chunk chunk = FFMain.worldManager.getActiveChunk(); //getActiveChunk() sometimes returns a chunk the player is not in
+		Position focusPos = mPosition.create(camWindow.focus); // It's possible for focusPos to be from a different
+																// chunk than "chunk"
+		Chunk chunk = FFMain.worldManager.getActiveChunk(); // getActiveChunk() sometimes returns a chunk the player is
+															// not in
 		Sight sight = mSight.create(perspective);
 
-		HashMap<String, RelativePosition> vision = new HashMap<String, RelativePosition>();
-		RelativePosition start = new RelativePosition();
-		start.x = focusPos.x;
-		start.y = focusPos.y;
-		start.e = chunk.getTile(focusPos.x, focusPos.y);
-		chunk.floodGrab(focusPos, start, sight.distance, start.e, vision);
+		HashMap<String, RelativePosition> vision = sight.visibleTiles;
+		// HashMap<String, RelativePosition> vision = new HashMap<String,
+		// RelativePosition>();
+		// chunk.floodGrab(focusPos, sight.distance, vision);
 
 		// This new method is also not the way
 		// This grabs all tiles that could be seen
@@ -86,91 +92,91 @@ public class TileRenderingSystem extends IteratingSystem { // This is for terrai
 		// TODO: change the movement system to be based on local tile neighbors
 		// TODO: By the palyer's hanging inTile reference, check if they've moved out of
 		// the active chunk, if so, SWTICH active chunk
-		
-		if (fullRedraw) {
-			clearBuffer();
 
-			//memoryDraw(camPos, camWindow);
-			//drawLocal(vision, sight.distance, camPos, camWindow);
-			olddrawLocal(vision, camPos, camWindow);
-			fullRedraw = false;
-			drewThisFrame = true;
-		}
-		
+		clearBuffer();
+
+		// memoryDraw(camPos, camWindow);
+		// drawLocal(vision, sight.distance, camPos, camWindow);
+		olddrawLocal(vision, camPos, camWindow);
+
 		TextGraphics tg = screen.newTextGraphics();
-		tg.fillRectangle(new TerminalPosition(0,0), 
-				new TerminalSize(FFMain.screenWidth/2, FFMain.screenHeight), emptyCharacter);
+		tg.fillRectangle(new TerminalPosition(0, 0), new TerminalSize(FFMain.screenWidth / 2, FFMain.screenHeight),
+				emptyCharacter);
 		tg.drawImage(new TerminalPosition(0, 0), buffer);
-			
-		//FFMain.worldManager.mapLoader.drawMap();
+
+		fullRedraw = false;
+		drewThisFrame = true;
+
+		// FFMain.worldManager.mapLoader.drawMap();
 
 	}
-	
+
 	@Subscribe
 	public void CameraShiftListener(CameraShift event) {
-		//FFMain.sendMessage(event.dx + ", " + event.dy);
+		// FFMain.sendMessage(event.dx + ", " + event.dy);
 	}
-	
+
 	private void clearBuffer() {
 		buffer.newTextGraphics().fillRectangle(new TerminalPosition(0, 0), buffer.getSize(), emptyCharacter);
 	}
-	
-	private void drawLocal(HashMap<String, RelativePosition> vision, int viewDistance, Position camPos, CameraWindow camWindow) {
-		//Right now this just goes through ALL the tiles grabbed a relative process
-		//So no more relativeness SHOULD NEED TO BE DONE!!!
-		//Instead, we should do a traditional LOS kinda
-		//but change vision to be a hashmap of tile IDs indexed by relative positions (which include ID anyways)
-		//Then have a loop through the edge of a circle of radius=sight.distance
-		//and it should draw every character along the way, from center out
-		//to avoid retracing rays.
-		//Do findLine, 
-		
+
+	private void drawLocal(HashMap<String, RelativePosition> vision, int viewDistance, Position camPos,
+			CameraWindow camWindow) {
+		// Right now this just goes through ALL the tiles grabbed a relative process
+		// So no more relativeness SHOULD NEED TO BE DONE!!!
+		// Instead, we should do a traditional LOS kinda
+		// but change vision to be a hashmap of tile IDs indexed by relative positions
+		// (which include ID anyways)
+		// Then have a loop through the edge of a circle of radius=sight.distance
+		// and it should draw every character along the way, from center out
+		// to avoid retracing rays.
+		// Do findLine,
+
 		Position playerPos = mPosition.create(perspective);
 		Sight sight = mSight.create(perspective);
 		ChunkAddress playerChunkAddress = mChunkAddress.create(perspective);
 		Chunk playerChunk = FFMain.worldManager.getChunk(playerChunkAddress.worldID);
-		
+
 		ArrayList<String> circle = new ArrayList<String>();
 		int angleTicks = 100;
-		for (int angle=0; angle<angleTicks; angle++) {
-			int x = (int) (viewDistance * Math.cos((angle*1.0/angleTicks)*PI*2));
-			int y = (int) (viewDistance * Math.sin((angle*1.0/angleTicks)*PI*2));
-			//x and y are circular offsets from the player's position
-			//Check if this point in the circle has been looked at already
-			if (!circle.contains(x+"|"+y)) {
-				circle.add(x+"|"+y);
-				
-				//&& vision.containsKey((x+playerPos.x)+"|"+(y+playerPos.y))
-				
+		for (int angle = 0; angle < angleTicks; angle++) {
+			int x = (int) (viewDistance * Math.cos((angle * 1.0 / angleTicks) * PI * 2));
+			int y = (int) (viewDistance * Math.sin((angle * 1.0 / angleTicks) * PI * 2));
+			// x and y are circular offsets from the player's position
+			// Check if this point in the circle has been looked at already
+			if (!circle.contains(x + "|" + y)) {
+				circle.add(x + "|" + y);
+
+				// && vision.containsKey((x+playerPos.x)+"|"+(y+playerPos.y))
+
 				Position screenPos = new Position();
 				screenPos.x = x - camPos.x;
 				screenPos.y = y - camPos.y;
-				
-				//Start is player position, end is player position and the circular offset
-				FFMain.worldManager.LOS(playerChunk, playerPos.x, playerPos.y, x+playerPos.x, y+playerPos.y, camPos.x, camPos.y, buffer);
+
+				// Start is player position, end is player position and the circular offset
+				//FFMain.worldManager.LOS(playerChunk, playerPos.x, playerPos.y, x + playerPos.x, y + playerPos.y,
+				//		camPos.x, camPos.y, buffer);
 			}
 		}
-		
-		//To fill in gaps
-		/*for (int angle=0; angle<angleTicks; angle++) {
-			int x = (int) (viewDistance-1 * Math.cos((angle*1.0/angleTicks)*PI*2));
-			int y = (int) (viewDistance-1 * Math.sin((angle*1.0/angleTicks)*PI*2));
-			//x and y are circular offsets from the player's position
-			//Check if this point in the circle has been looked at already
-			if (!circle.contains(x+"|"+y)) {
-				circle.add(x+"|"+y);
-				
-				//&& vision.containsKey((x+playerPos.x)+"|"+(y+playerPos.y))
-				
-				Position screenPos = new Position();
-				screenPos.x = x - camPos.x;
-				screenPos.y = y - camPos.y;
-				
-				//Start is player position, end is player position and the circular offset
-				FFMain.worldManager.LOS(playerChunk, playerPos.x, playerPos.y, x+playerPos.x, y+playerPos.y, camPos.x, camPos.y, buffer);
-			}
-		}*/
-		
+
+		// To fill in gaps
+		/*
+		 * for (int angle=0; angle<angleTicks; angle++) { int x = (int) (viewDistance-1
+		 * * Math.cos((angle*1.0/angleTicks)*PI*2)); int y = (int) (viewDistance-1 *
+		 * Math.sin((angle*1.0/angleTicks)*PI*2)); //x and y are circular offsets from
+		 * the player's position //Check if this point in the circle has been looked at
+		 * already if (!circle.contains(x+"|"+y)) { circle.add(x+"|"+y);
+		 * 
+		 * //&& vision.containsKey((x+playerPos.x)+"|"+(y+playerPos.y))
+		 * 
+		 * Position screenPos = new Position(); screenPos.x = x - camPos.x; screenPos.y
+		 * = y - camPos.y;
+		 * 
+		 * //Start is player position, end is player position and the circular offset
+		 * FFMain.worldManager.LOS(playerChunk, playerPos.x, playerPos.y, x+playerPos.x,
+		 * y+playerPos.y, camPos.x, camPos.y, buffer); } }
+		 */
+
 		for (RelativePosition rel : vision.values()) {
 			Tile tile = mTile.create(rel.e);
 			Char character = mChar.create(rel.e);
@@ -184,14 +190,15 @@ public class TileRenderingSystem extends IteratingSystem { // This is for terrai
 	}
 
 	private void olddrawLocal(HashMap<String, RelativePosition> vision, Position camPos, CameraWindow camWindow) {
-		//Right now this just goes through ALL the tiles grabbed a relative process
-		//So no more relativeness SHOULD NEED TO BE DONE!!!
-		//Instead, we should do a traditional LOS kinda
-		//but change vision to be a hashmap of tile IDs indexed by relative positions (which include ID anyways)
-		//Then have a loop through the edge of a circle of radius=sight.distance
-		//and it should draw every character along the way, from center out
-		//to avoid retracing rays.
-		//Do findLine, 
+		// Right now this just goes through ALL the tiles grabbed a relative process
+		// So no more relativeness SHOULD NEED TO BE DONE!!!
+		// Instead, we should do a traditional LOS kinda
+		// but change vision to be a hashmap of tile IDs indexed by relative positions
+		// (which include ID anyways)
+		// Then have a loop through the edge of a circle of radius=sight.distance
+		// and it should draw every character along the way, from center out
+		// to avoid retracing rays.
+		// Do findLine,
 		for (RelativePosition rel : vision.values()) {
 			int t = rel.e;
 			Position pos = new Position();
@@ -204,8 +211,8 @@ public class TileRenderingSystem extends IteratingSystem { // This is for terrai
 			ChunkAddress chunkAddress = mChunkAddress.create(t);
 			Chunk chunk = FFMain.worldManager.getChunk(chunkAddress.worldID);
 			Tile tile = mTile.create(t);
-			
-			//if (fullRedraw) tile.cachedLOS = false;
+
+			// if (fullRedraw) tile.cachedLOS = false;
 
 			// if (chunkAddress.worldID == FFMain.worldManager.activeChunk) {
 			Position screenPos = new Position();
@@ -224,17 +231,24 @@ public class TileRenderingSystem extends IteratingSystem { // This is for terrai
 					// if (true) {//pos.withinDistance(playerPos, sight.distance) ) {
 					// && FFMain.worldManager.getActiveChunk().LOS(playerPos.x, playerPos.y, pos.x,
 					// pos.y)) {
-					//TODO: this is significantly broken
-					//RESOLUTION(?): parameter "start" was the chunk of the destination tile, not the player's chunk.
-					//if (playerChunkAddress.worldID != chunkAddress.worldID) continue;
-					//FFMain.worldManager.LOS(playerChunk, playerPos.x, playerPos.y, pos.x, pos.y, buffer);
-					if (FFMain.worldManager.badLOS(playerChunk, playerPos.x, playerPos.y, pos.x, pos.y)) { //TODO: CROSSING CHUNKS IS FUCKING BROKEN
-						if (!drawEntity(screenPos, tile, character)) {
-							buffer.setCharacterAt(screenPos.x, screenPos.y, character.getTextCharacter());
-						}
-						tile.seen = true;
-						//tile.cachedLOS = true;
+					// TODO: this is significantly broken
+					// RESOLUTION(?): parameter "start" was the chunk of the destination tile, not
+					// the player's chunk.
+					// if (playerChunkAddress.worldID != chunkAddress.worldID) continue;
+					// FFMain.worldManager.LOS(playerChunk, playerPos.x, playerPos.y, pos.x, pos.y,
+					// buffer);
+					// if (FFMain.worldManager.badLOS(playerChunk, playerPos.x, playerPos.y, pos.x,
+					// pos.y)) { // TODO:
+					// CROSSING
+					// CHUNKS IS
+					// FUCKING
+					// BROKEN
+					if (!drawEntity(screenPos, tile, character)) {
+						buffer.setCharacterAt(screenPos.x, screenPos.y, character.getTextCharacter());
 					}
+					tile.seen = true;
+					// tile.cachedLOS = true;
+					// }
 					// } //Don't draw anything not in your line of sight
 				}
 			}
@@ -284,9 +298,11 @@ public class TileRenderingSystem extends IteratingSystem { // This is for terrai
 								buffer.setCharacterAt(screenPos.x, screenPos.y, character.getTextCharacter());
 						} else {
 							if (tile.seen) { // Draw memory
-								buffer.setCharacterAt(screenPos.x, screenPos.y, character.getTextCharacter(8, 0, false));
+								buffer.setCharacterAt(screenPos.x, screenPos.y,
+										character.getTextCharacter(8, 0, false));
 							} else { // Black out unknown areas
-								buffer.setCharacterAt(screenPos.x, screenPos.y, character.getTextCharacter(0, 0, false));
+								buffer.setCharacterAt(screenPos.x, screenPos.y,
+										character.getTextCharacter(0, 0, false));
 							}
 						}
 					}
@@ -317,8 +333,9 @@ public class TileRenderingSystem extends IteratingSystem { // This is for terrai
 
 		if (winner == -1)
 			return false;
-		
-		//System.out.println(winner + ", " + mChar.get(winner).character + ", " + mIsDead.has(winner));
+
+		// System.out.println(winner + ", " + mChar.get(winner).character + ", " +
+		// mIsDead.has(winner));
 
 		TextCharacter ct = mChar.get(winner).getTextCharacter();
 		buffer.setCharacterAt(pos.x, pos.y, ct.withBackgroundColor(TextColor.ANSI.values()[tileChar.bgc]));

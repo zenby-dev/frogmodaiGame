@@ -14,5 +14,6 @@
 	<classpathentry kind="lib" path="/Users/robertcardinal/eclipse-workspace/frogmodaiGame/lib/contrib-plugin-operations.jar"/>
 	<classpathentry kind="lib" path="/Users/robertcardinal/eclipse-workspace/frogmodaiGame/lib/contrib-core.jar"/>
 	<classpathentry kind="lib" path="/Users/robertcardinal/eclipse-workspace/frogmodaiGame/lib/jsonbeans-0.9.jar"/>
+	<classpathentry kind="lib" path="/Users/robertcardinal/eclipse-workspace/frogmodaiGame/lib/commons-pool2-2.7.0.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

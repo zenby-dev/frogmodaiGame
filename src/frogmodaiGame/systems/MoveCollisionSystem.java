@@ -48,16 +48,20 @@ public class MoveCollisionSystem extends BaseSystem {
 		int neighbor = event.neighborTile;
 		//System.out.println(e + ", " + neighbor);
 		
-		OnTouch onTouch = mOnTouch.create(e);
-		onTouch.act.accept(e, neighbor);
+		//OnTouch onTouch = mOnTouch.create(e);
+		//onTouch.act.accept(e, neighbor);
+		
 
 		Tile tile = mTile.create(neighbor);
 		if (tile.entitiesHere.size() > 0) {
 			for (int o : tile.entitiesHere) {
-				if (mOnTouched.has(o)) {
+				//System.out.println(e + ", " + mIsPlayer.has(e) + ", " + o + ", " + mIsPlayer.has(o));
+				es.dispatch(new frogmodaiGame.events.OnTouch(e, o));
+				//es.dispatch(new frogmodaiGame.events.OnTouched(o, e));
+				/*if (mOnTouched.has(o)) {
 					OnTouched onTouched = mOnTouched.create(o);
 					onTouched.act.accept(o, e);
-				}
+				}*/
 			}
 		}
 	}
