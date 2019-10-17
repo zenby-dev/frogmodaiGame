@@ -6,7 +6,7 @@ import java.util.HashMap;
 import com.artemis.Component;
 
 public class Sight extends Component {
-	public int distance = 30;
+	public int distance = 12;
 	public boolean blinded = false;
 	public float darkSight = 0.25f; //Multiplier for distance
 	public HashMap<String, RelativePosition> visibleTiles = new HashMap<String, RelativePosition>();

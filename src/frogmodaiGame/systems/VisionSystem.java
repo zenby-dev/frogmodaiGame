@@ -51,13 +51,13 @@ public class VisionSystem extends IteratingSystem {
 		Chunk chunk = FFMain.worldManager.getChunk(ca.worldID);
 		
 		//System.out.println(e);
-		sight.clear();
-		chunk.floodGrab(myPos, sight.distance, sight.visibleTiles);
+		//sight.clear();
+		//chunk.floodGrab(myPos, sight.distance, sight.visibleTiles);
 		
 		//Grab all visitable tiles first
-		//HashMap<String, RelativePosition> visitable = new HashMap<String, RelativePosition>();
-		//chunk.floodGrab(myPos, sight.distance, visitable);
-		/*
+		HashMap<String, RelativePosition> visitable = new HashMap<String, RelativePosition>();
+		chunk.floodGrab(myPos, sight.distance, visitable);
+		
 		//Prune down to visible tiles only
 		sight.visibleTiles.clear();
 		for (RelativePosition rel : visitable.values()) {
@@ -67,7 +67,6 @@ public class VisionSystem extends IteratingSystem {
 			}
 		}
 		
-		*/
 		sight.refreshNeeded = false;
 	}
 }

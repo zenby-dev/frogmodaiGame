@@ -159,6 +159,12 @@ public class Chunk { // SHOULD NOT CONTAIN ANY GENERATION CODE
 			todo.remove(r);
 			if (todo.isEmpty() && !newTodo.isEmpty()) {
 				todo.addAll(newTodo); //begin new cycle
+				/*for (RelativePosition q : newTodo) {
+					boolean pass = FFMain.worldManager.badLOS(this, startPos.x, startPos.y, q.x, q.y);
+					if (pass) {
+						todo.add(q);
+					}
+				}*/
 				newTodo.clear();
 				depth++;
 			}
@@ -182,6 +188,8 @@ public class Chunk { // SHOULD NOT CONTAIN ANY GENERATION CODE
 	public void floodGrabCheckTile(Position startPos, RelativePosition rel, int d, float _depth, int e, final HashMap<String, RelativePosition> list,
 			final HashMap<String, RelativePosition> touched, final ArrayList<RelativePosition> todo, Random random) {
 		Tile tile = mTile.create(e); // These tiles aren't necessarily in the same chunk
+		//ChunkAddress ca = mChunkAddress.create(e);
+		//Chunk chunk = FFMain.worldManager.getChunk(ca.worldID);
 		Position tilePos = mPosition.create(e);
 
 		// if (list.size() > 100) return;
@@ -216,6 +224,8 @@ public class Chunk { // SHOULD NOT CONTAIN ANY GENERATION CODE
 			
 			//if (newrel == null) continue; //HACKY SHIT
 			
+			//if (!(i == 1 || i == 3 || i == 4 || i == 6)) return;
+			
 			Position dir = DirectionConverter.toPosition(i);
 			newrel.x = rel.x + dir.x;
 			newrel.y = rel.y + dir.y;
@@ -225,6 +235,7 @@ public class Chunk { // SHOULD NOT CONTAIN ANY GENERATION CODE
 			newrel.e = j;
 			//System.out.printf("1: %d %d %d\n", newrel.x, newrel.y, newrel.e);
 			//Flooding stops locally when a tile with the same relative position has already been touched.
+			
 			if (j != -1 && (!touched.containsKey(newrel.x + "|" + newrel.y) 
 					|| touched.get(newrel.x + "|" + newrel.y).pathLength > newrel.pathLength)) {// !list.contains((Integer) j)) {
 				//System.out.println("hm");

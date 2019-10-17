@@ -274,8 +274,10 @@ public class BasicDungeon {
 		(chunk1).attach((chunk2), 3, -4);
 		(chunk2).attach((chunk1), 1, 4);
 
-		(chunk3).attachSingleTile((chunk1), 1, 0, (36 / 2), 10);
-		(chunk1).attachSingleTile((chunk3), 3, 0, 10, (36 / 2));
+		chunk3.portal(chunk1, 1, 3, 18, 0, 10, chunk1.height-1, false);
+		chunk1.portal(chunk3, 1, 1, 10, chunk1.height-1, 18, 0, false);
+		//(chunk3).attachSingleTile((chunk1), 1, 0, (36 / 2), 10);
+		//(chunk1).attachSingleTile((chunk3), 3, 0, 10, (36 / 2));
 	}
 
 	void loadTestWorld(Chunk chunk) {

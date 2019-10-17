@@ -37,7 +37,7 @@ public enum ArchetypeBuilders {
 			.add(Description.class)
 			.add(Weight.class)
 			.add(Container.class)
-			//.add(Sight.class)
+			.add(Sight.class)
 			.add(OnTile.class)),
 	Item(new ArchetypeBuilder()
 			.add(IsItem.class)
