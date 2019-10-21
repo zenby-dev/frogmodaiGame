@@ -1,0 +1,22 @@
+10/19/19
+When an entity has X components, subscribe to Y events
+Entity has empty signifier component and the other components required for that interface
+
+Band of roving bards that influence political/popular opinion in the regions they visit
+It would be cool to explore within a city for its cityness as opposed to delving a dungeon
+I want to generate a city or town where the NPCs go from place to place doing tasks that transform resources and trading messages with each other
+
+Non-lethal fights (getting drunk and surly)
+
+Complex interactables (eg. gun with many keys for many small-grained parts of operating it in that train robbery 7drl)
+
+COMPUTERS??? Maybe not making the palyer code in a bullshit scripting language or anything.
+But having some sort of system of object interactions that you could intervene in would be cool
+Like my old idea of having an elevator system controller located in the building, and being able to hack it??
+
+
+
+Pathfinding idea:
+Before finding direct node path, find path in the chunk graph?
+But what if there is another point within the same chunk that is inaccessible without passing through different chunks???
+In that case just regular BFS would be better
