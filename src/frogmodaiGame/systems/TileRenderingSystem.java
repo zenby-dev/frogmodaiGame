@@ -22,6 +22,8 @@ import frogmodaiGame.Chunk;
 import frogmodaiGame.FFMain;
 import frogmodaiGame.components.*;
 import frogmodaiGame.events.CameraShift;
+import frogmodaiGame.events.PostTileRendering;
+import net.mostlyoriginal.api.event.common.EventSystem;
 import net.mostlyoriginal.api.event.common.Subscribe;
 
 public class TileRenderingSystem extends IteratingSystem { // This is for terrain only
@@ -35,6 +37,8 @@ public class TileRenderingSystem extends IteratingSystem { // This is for terrai
 	ComponentMapper<TimedActor> mTimedActor;
 	ComponentMapper<IsDead> mIsDead;
 
+	EventSystem es;
+	
 	Screen screen;
 	@EntityId
 	public int perspective = -1;
@@ -106,6 +110,8 @@ public class TileRenderingSystem extends IteratingSystem { // This is for terrai
 
 		fullRedraw = false;
 		drewThisFrame = true;
+		
+		es.dispatch(new PostTileRendering());
 
 		// FFMain.worldManager.mapLoader.drawMap();
 

@@ -9,9 +9,13 @@ import com.artemis.Aspect.Builder;
 import com.artemis.BaseSystem;
 import com.artemis.ComponentMapper;
 import com.artemis.systems.IteratingSystem;
+import com.googlecode.lanterna.TextCharacter;
+import com.googlecode.lanterna.TextColor;
 import com.googlecode.lanterna.input.KeyStroke;
 import com.googlecode.lanterna.input.KeyType;
+import com.googlecode.lanterna.screen.Screen;
 
+import frogmodaiGame.Chunk;
 import frogmodaiGame.FFMain;
 import frogmodaiGame.commands.DropCommand;
 import frogmodaiGame.commands.PickupCommand;
@@ -21,6 +25,7 @@ import frogmodaiGame.events.ActorTakeTurn;
 import frogmodaiGame.events.ChangeStat;
 import frogmodaiGame.events.HPAtZero;
 import frogmodaiGame.events.MoveAttempt;
+import frogmodaiGame.events.PostTileRendering;
 import frogmodaiGame.events.ScreenRefreshRequest;
 import frogmodaiGame.events.TryToHit;
 import frogmodaiGame.events.HPAtZero.After;
@@ -33,6 +38,8 @@ public class PlayerSystem extends BaseSystem {
 	ComponentMapper<IsPlayer> mIsPlayer;
 	ComponentMapper<IsFaction> mIsFaction;
 	ComponentMapper<TimedActor> mTimedActor;
+	ComponentMapper<ChunkAddress> mChunkAddress;
+	ComponentMapper<Position> mPosition;
 
 	EventSystem es;
 
@@ -43,7 +50,33 @@ public class PlayerSystem extends BaseSystem {
 
 	@Override
 	protected void processSystem() {
-
+		
+	}
+	
+	public void astarTest() {
+		int _player = FFMain.playerID;
+		ChunkAddress ca = mChunkAddress.get(_player);
+		Chunk chunk = FFMain.worldManager.getChunk(ca.worldID);
+		Position pos = mPosition.get(_player);
+		ArrayList<Integer> path = chunk.findPath(pos.x, pos.y, 5, 5);
+		
+		Screen screen = FFMain.screen;
+		Position camPos = mPosition.get(FFMain.cameraID);
+		
+		if (path != null && camPos != null) {
+			for (int e : path) {
+				Position tilePos = mPosition.get(e);
+				int screenX = tilePos.x - camPos.x;
+				int screenY = tilePos.y - camPos.y;
+				//System.out.println(screenX + " " + screenY);
+				screen.setCharacter(screenX, screenY, new TextCharacter('X', TextColor.ANSI.YELLOW, TextColor.ANSI.BLUE));
+			}
+		}
+	}
+	
+	@Subscribe 
+	public void PostTileRenderingListener(PostTileRendering event) {
+		astarTest();
 	}
 	
 	@Subscribe

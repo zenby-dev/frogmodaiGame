@@ -59,7 +59,7 @@ public class GoblinSystem extends BaseSystem {
 		//ChangeStat.run("HP", event.target, -1);
 	}
 
-	public void moveTowardsPlayer(int e, int relx, int rely) {
+	public void moveRelative(int e, int relx, int rely) { //Walks in a direction vector
 		int dx = relx == 0 ? 0 : Math.abs(relx)/relx;
 		int dy = rely == 0 ? 0 : Math.abs(rely)/rely;
 		if (!(dx == 0 && dy == 0)) {
@@ -143,7 +143,7 @@ public class GoblinSystem extends BaseSystem {
 		
 		if (goblin.aiState == 2) {
 			MOVE_COST = (int) (timedActor.speed * 1.0f);
-			moveTowardsPlayer(e, relx, rely);
+			moveRelative(e, relx, rely);
 		} else if (goblin.aiState == 0) {
 			MOVE_COST = (int) (timedActor.speed * 1.0f);
 			if (FFMain.random.nextInt(10) < 3)

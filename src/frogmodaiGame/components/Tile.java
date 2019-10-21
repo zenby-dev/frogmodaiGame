@@ -18,6 +18,9 @@ public class Tile extends Component {
 	//This field is going to be really important
 	//Entities shouldn't be stored at positions, they should be stored based on what Tile they're on
 	//Maybe.. if possible... we'll see
+	public int gCost;
+	public int hCost;
+	@EntityId public int pfparent;
 	
 	public Tile() {
 		entitiesHere = new ArrayList<Integer>();
@@ -25,5 +28,9 @@ public class Tile extends Component {
 		for (int i = 0; i < 8; i++) {
 			neighbors[i] = -1;
 		}
+	}
+	
+	public int fCost() {
+		return gCost + hCost;
 	}
 }

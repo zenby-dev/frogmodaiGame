@@ -43,7 +43,7 @@ public class WorldManager {
 	
 	final WorldSerializationManager serialManager = new WorldSerializationManager();
 
-	CaveGenerator caveGenerator;
+	public CaveGenerator caveGenerator;
 	public MapLoader mapLoader;
 
 	ComponentMapper<Tile> mTile;
@@ -493,8 +493,8 @@ public class WorldManager {
 			
 			
 			
-			Tile oldTile = mTile.create(t);
-			ChunkAddress tileChunkAddress = mChunkAddress.create(t);
+			Tile oldTile = mTile.get(t);
+			ChunkAddress tileChunkAddress = mChunkAddress.get(t);
 			
 			//screen.setCharacter(line[i-2], line[i-1], new TextCharacter((char)((i/2)+48), TextColor.ANSI.GREEN, TextColor.ANSI.MAGENTA));
 
@@ -511,9 +511,9 @@ public class WorldManager {
 			//screen.setCharacter(x, y, new TextCharacter((char)((dir)+48), TextColor.ANSI.RED, TextColor.ANSI.CYAN));
 			
 			
-			Tile newTile = mTile.create(t);
-			Char newChar = mChar.create(t);
-			ChunkAddress newTileChunkAddress = mChunkAddress.create(t);
+			Tile newTile = mTile.get(t);
+			Char newChar = mChar.get(t);
+			ChunkAddress newTileChunkAddress = mChunkAddress.get(t);
 			
 			
 			

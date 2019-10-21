@@ -2,8 +2,10 @@ package frogmodaiGame;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Random;
 import java.util.HashMap;
+import java.util.HashSet;
 
 import com.artemis.Aspect;
 import com.artemis.ComponentMapper;
@@ -122,6 +124,102 @@ public class Chunk { // SHOULD NOT CONTAIN ANY GENERATION CODE
 		return tile.entitiesHere;
 	}
 	
+	public ArrayList<Integer> findPath(int x1, int y1, int x2, int y2) {
+		if (!posInChunk(x1,y1) || !posInChunk(x2,y2)) return null;
+		
+		int startID = getTile(x1, y1);
+		Tile startNode = mTile.get(startID);
+		int targetID = getTile(x2, y2);
+		Tile targetNode = mTile.get(targetID);
+		
+		ArrayList<Integer> openSet = new ArrayList<Integer>();
+		HashSet<Integer> closedSet = new HashSet<Integer>();
+		openSet.add(startID);
+		
+		while (openSet.size() > 0) {
+			int _node = openSet.get(0);
+			Tile node = mTile.get(_node);
+			for (int i = 1; i < openSet.size(); i++) {
+				int _other = openSet.get(i);
+				Tile other = mTile.get(_other);
+				if (other.fCost() < node.fCost() || other.fCost() == node.fCost()) {
+					if (other.hCost < node.hCost) {
+						_node = _other;
+						node = other;
+					}
+				}
+			}
+			
+			//System.out.println("fuck");
+			
+			//System.out.println(openSet.size());
+			//System.out.println(openSet.contains(_node));
+			openSet.remove((Integer)_node);
+			closedSet.add(_node);
+			
+			if (node == targetNode) {
+				ArrayList<Integer> ret = retracePath(startID, targetID);
+				//System.out.println(ret.size());
+				return ret;
+			}
+			
+			ChunkAddress mca = mChunkAddress.get(_node);
+			for (int nid : node.neighbors) {
+				if (nid == -1) continue;
+				Tile neighbor = mTile.get(nid);
+				ChunkAddress nca = mChunkAddress.get(nid);
+				if (nca.worldID != mca.worldID || !pfPassable(nid, startID, targetID) || closedSet.contains(nid)) {
+					continue;
+				}
+				
+				int newCostToNeighbor = node.gCost + getPFDistance(_node, nid);
+				if (newCostToNeighbor < neighbor.gCost || !openSet.contains(nid)) {
+					neighbor.gCost = newCostToNeighbor;
+					neighbor.hCost = getPFDistance(nid, targetID);
+					neighbor.pfparent = _node;
+					
+					if (!openSet.contains(nid)) {
+						//System.out.println("adding " + nid);
+						openSet.add(nid);
+					}
+				}
+			}
+		}
+		//System.out.println("FAILURE");
+		return null;
+	}
+	
+	private boolean pfPassable(int e, int startID, int targetID) {
+		Tile tile = mTile.get(e);
+		return !(tile.solid || tile.occupied) || e == startID || e == targetID;
+	}
+	
+	public ArrayList<Integer> retracePath(int startID, int targetID) {
+		ArrayList<Integer> path = new ArrayList<Integer>();
+		int currentNode = targetID;
+		
+		while (currentNode != startID) {
+			path.add(currentNode);
+			Tile tile = mTile.get(currentNode);
+			currentNode = tile.pfparent;
+		}
+		
+		Collections.reverse(path);
+		
+		return path;
+	}
+	
+	public int getPFDistance(int startID, int targetID) {
+		Position startPos = mPosition.get(startID);
+		Position targetPos = mPosition.get(targetID);
+		int dstX = Math.abs(startPos.x - targetPos.x);
+		int dstY = Math.abs(startPos.y - targetPos.y);
+		
+		if (dstX > dstY)
+			return 14*dstY + 10*(dstX-dstY);
+		return 14*dstX + 10*(dstY-dstX);
+	}
+	
 	//IF the path crawled is longer than a direct line, toss it out?????
 	//To prevent leakage around corners.
 	
@@ -190,7 +288,7 @@ public class Chunk { // SHOULD NOT CONTAIN ANY GENERATION CODE
 		Tile tile = mTile.create(e); // These tiles aren't necessarily in the same chunk
 		//ChunkAddress ca = mChunkAddress.create(e);
 		//Chunk chunk = FFMain.worldManager.getChunk(ca.worldID);
-		Position tilePos = mPosition.create(e);
+		Position tilePos = mPosition.get(e);
 
 		// if (list.size() > 100) return;
 		

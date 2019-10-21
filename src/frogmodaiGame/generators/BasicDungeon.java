@@ -240,7 +240,7 @@ public class BasicDungeon {
 	}
 
 	public void someshit() {
-		int _chunk1 = FFMain.worldManager.createChunk(12 * 1, 12 * 1);
+		int _chunk1 = FFMain.worldManager.createChunk(12 * 3, 12 * 3);
 		int _chunk2 = FFMain.worldManager.createChunk(4, 36);
 		int _chunk3 = FFMain.worldManager.createChunk(36, 4);
 		FFMain.worldManager.setActiveChunk(_chunk1);
@@ -249,6 +249,7 @@ public class BasicDungeon {
 		Chunk chunk3 = FFMain.worldManager.getChunk(_chunk3);
 		// generateTest();
 		loadTestWorld(chunk1);
+		FFMain.worldManager.caveGenerator.generate(chunk1);
 		loadTest2(chunk2);
 		loadTest2(chunk3);
 		// generateTest();
