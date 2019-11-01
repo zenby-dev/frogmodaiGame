@@ -1,0 +1,10 @@
+package frogmodaiGame.events;
+
+import frogmodaiGame.CancellableEvent;
+import net.mostlyoriginal.api.event.common.Cancellable;
+import net.mostlyoriginal.api.event.common.Event;
+
+public class PlayerTookTurn implements Event {
+	public PlayerTookTurn() {
+	}
+}

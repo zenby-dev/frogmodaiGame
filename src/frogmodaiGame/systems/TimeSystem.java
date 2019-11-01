@@ -26,6 +26,7 @@ public class TimeSystem extends IteratingSystem {
 	int currentActor = -1;
 	boolean currentActorRemoved = false;
 	int lockCount = 0;
+	public int actedCount = 0;
 	
 	public TimeSystem() {
 		super(Aspect.all(TimedActor.class));

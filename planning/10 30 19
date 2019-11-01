@@ -1,0 +1,8 @@
+10/30/19
+Farmer General of the Wizardly Dissociative Service
+
+Maybe directed portal definitions should be attached directly to tiles????
+naaah
+
+In portal algorithm, only do A* to the centermost tile in a portal
+Also, change A* to have option for whether creatures should affect pathfinding

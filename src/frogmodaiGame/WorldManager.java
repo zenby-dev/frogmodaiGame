@@ -22,6 +22,7 @@ import frogmodaiGame.events.CameraShift;
 import frogmodaiGame.events.ChangeStat;
 import frogmodaiGame.events.HPAtZero;
 import frogmodaiGame.events.ScreenRefreshRequest;
+import frogmodaiGame.events.TurnCycle;
 import frogmodaiGame.generators.*;
 import frogmodaiGame.systems.*;
 import net.mostlyoriginal.api.event.common.Event;
@@ -115,9 +116,15 @@ public class WorldManager {
 		getActiveChunk().update();
 		TimeSystem timeSystem = world.getSystem(TimeSystem.class);
 		int actorsPerUpdate = timeSystem.getNumActors();
-		for (int i = 0; i < actorsPerUpdate; i++) { // ACTORS PROPOSE ACTIONS
+		es.dispatch(new TurnCycle.Before());
+		for (int i = 0; i < actorsPerUpdate; i++) {
 			if (!timeSystem.tick(i))
 				break;
+			timeSystem.actedCount++;
+		}
+		if (timeSystem.actedCount >= actorsPerUpdate) {
+			timeSystem.actedCount = 0;
+			es.dispatch(new TurnCycle.After()); 	
 		}
 		world.process();
 	}
@@ -155,13 +162,16 @@ public class WorldManager {
 	public boolean refreshNeeded() {
 		if (screenRefreshRequested) {
 			screenRefreshRequested = false;
+			//System.out.println("a");
 			//world.getSystem(TileRenderingSystem.class).triggerRedraw();
 			//world.getSystem(DescriptiveTextSystem.class).triggerRedraw();
 			return true;
 		}
 		if (		world.getSystem(TileRenderingSystem.class).drewThisFrame ||
-				world.getSystem(DescriptiveTextSystem.class).drewThisFrame)
+				world.getSystem(DescriptiveTextSystem.class).drewThisFrame) {
+			//System.out.println("b");
 			return true;
+		}
 		return false;
 	}
 

@@ -12,6 +12,8 @@ import frogmodaiGame.Chunk;
 import frogmodaiGame.FFMain;
 import frogmodaiGame.components.Char;
 import frogmodaiGame.components.ChunkAddress;
+import frogmodaiGame.components.CoupledPortalDef;
+import frogmodaiGame.components.DirectedPortalDef;
 import frogmodaiGame.components.Position;
 import frogmodaiGame.components.Tile;
 
@@ -21,6 +23,7 @@ public class BasicDungeon {
 	ComponentMapper<Char> mChar;
 	ComponentMapper<Position> mPosition;
 	ComponentMapper<ChunkAddress> mChunkAddress;
+	ComponentMapper<CoupledPortalDef> mCoupledPortalDef;
 
 	HashMap<Integer, ArrayList<Entrance>> entrances;
 	ArrayList<Integer> rooms;
@@ -83,6 +86,17 @@ public class BasicDungeon {
 			}
 		}
 	}
+	
+	public void createCoupledPortal(Chunk chunk1, Chunk chunk2, Entrance entrance1, Entrance entrance2) {
+		int portal1 = chunk1.portal(chunk2, entrance1.width, entrance1.dir, entrance1.x, entrance1.y, entrance2.x, entrance2.y,
+				true);
+		int portal2 = chunk2.portal(chunk1, entrance2.width, entrance2.dir, entrance2.x, entrance2.y, entrance1.x, entrance1.y,
+				true);
+		int e = FFMain.worldManager.world.create();
+		CoupledPortalDef portalDef = mCoupledPortalDef.create(e);
+		portalDef.portal1 = portal1;
+		portalDef.portal2 = portal2;
+	}
 
 	public void tryConnectRooms(int room1, int room2) {
 		// int room1 = Math.abs(FFMain.random.nextInt(rooms.size()));
@@ -99,10 +113,7 @@ public class BasicDungeon {
 		if (entrance1.width == entrance2.width && entrance1.dir == (entrance2.dir + 2) % 4) {
 			Chunk chunk1 = FFMain.worldManager.getChunk(entrance1.chunk);
 			Chunk chunk2 = FFMain.worldManager.getChunk(entrance2.chunk);
-			chunk1.portal(chunk2, entrance1.width, entrance1.dir, entrance1.x, entrance1.y, entrance2.x, entrance2.y,
-					true);
-			chunk2.portal(chunk1, entrance2.width, entrance2.dir, entrance2.x, entrance2.y, entrance1.x, entrance1.y,
-					true);
+			createCoupledPortal(chunk1, chunk2, entrance1, entrance2);
 			//System.out.printf("%d %d %d %d\n", room1, room2, _entrance1, _entrance2);
 			entrances.get(room1).remove(entrance1);
 			entrances.get(room2).remove(entrance2);

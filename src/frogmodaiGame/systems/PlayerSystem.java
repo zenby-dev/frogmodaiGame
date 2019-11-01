@@ -25,6 +25,7 @@ import frogmodaiGame.events.ActorTakeTurn;
 import frogmodaiGame.events.ChangeStat;
 import frogmodaiGame.events.HPAtZero;
 import frogmodaiGame.events.MoveAttempt;
+import frogmodaiGame.events.PlayerTookTurn;
 import frogmodaiGame.events.PostTileRendering;
 import frogmodaiGame.events.ScreenRefreshRequest;
 import frogmodaiGame.events.TryToHit;
@@ -145,6 +146,8 @@ public class PlayerSystem extends BaseSystem {
 					//Except I don't want to add the menu yet, just checking the local tile for objects
 				}
 			}
+			
+			es.dispatch(new PlayerTookTurn());
 			
 			FFMain.keystroke = null; // KEYSTROKES SHOULD NOT COUNT MORE THAN ONCE
 		}

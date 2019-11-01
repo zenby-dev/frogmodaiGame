@@ -20,3 +20,6 @@ Pathfinding idea:
 Before finding direct node path, find path in the chunk graph?
 But what if there is another point within the same chunk that is inaccessible without passing through different chunks???
 In that case just regular BFS would be better
+
+10/30/19
+Farmer General of the Wizardly Dissociative Service

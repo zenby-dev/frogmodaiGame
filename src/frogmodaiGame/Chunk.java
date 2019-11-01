@@ -37,6 +37,7 @@ public class Chunk { // SHOULD NOT CONTAIN ANY GENERATION CODE
 	ComponentMapper<Char> mChar;
 	ComponentMapper<Tile> mTile;
 	ComponentMapper<ChunkAddress> mChunkAddress;
+	ComponentMapper<DirectedPortalDef> mDirectedPortalDef;
 
 	// This class is only for creating and holding the map representation
 	// Other classes should be used to populate it
@@ -658,7 +659,19 @@ public class Chunk { // SHOULD NOT CONTAIN ANY GENERATION CODE
 		return true;
 	}
 
-	public boolean portal(Chunk chunk, int w, int dir, int _ox, int _oy, int _dx, int _dy, boolean wall) {
+	public int portal(Chunk chunk, int w, int dir, int _ox, int _oy, int _dx, int _dy, boolean wall) {
+		int e = FFMain.worldManager.world.create();
+		DirectedPortalDef portalDef = mDirectedPortalDef.create(e);
+		ChunkAddress ca = mChunkAddress.create(e);
+		ca.worldID = chunk.worldID;
+		portalDef.width = w;
+		portalDef.dir = dir;
+		portalDef.tiles = new int[w];
+		portalDef.ox = _ox;
+		portalDef.oy = _oy;
+		portalDef.dx = _dx;
+		portalDef.dy = _dy;
+		
 		for (int i = 0; i < w; i++) { //width of opening
 			if (dir == 0) {//portal opens left, extends down
 				int ox = _ox;
@@ -667,6 +680,7 @@ public class Chunk { // SHOULD NOT CONTAIN ANY GENERATION CODE
 				int dy = _dy + i;
 				
 				int me = getTile(ox, oy); //portal in
+				portalDef.tiles[i] = me;
 				if (chunk.posInChunk(dx, dy)) {
 					int them = chunk.getTile(dx, dy); //portal out
 					Tile meTile = mTile.create(me);
@@ -717,6 +731,7 @@ public class Chunk { // SHOULD NOT CONTAIN ANY GENERATION CODE
 				int dy = _dy;
 				
 				int me = getTile(ox, oy); //portal in
+				portalDef.tiles[i] = me;
 				if (chunk.posInChunk(dx, dy)) {
 					int them = chunk.getTile(dx, dy); //portal out
 					Tile meTile = mTile.create(me);
@@ -768,6 +783,7 @@ public class Chunk { // SHOULD NOT CONTAIN ANY GENERATION CODE
 				int dy = _dy + i;
 				
 				int me = getTile(ox, oy); //portal in
+				portalDef.tiles[i] = me;
 				if (chunk.posInChunk(dx, dy)) {
 					int them = chunk.getTile(dx, dy); //portal out
 					Tile meTile = mTile.create(me);
@@ -818,6 +834,7 @@ public class Chunk { // SHOULD NOT CONTAIN ANY GENERATION CODE
 				int dy = _dy;
 				
 				int me = getTile(ox, oy); //portal in
+				portalDef.tiles[i] = me;
 				if (chunk.posInChunk(dx, dy)) {
 					int them = chunk.getTile(dx, dy); //portal out
 					Tile meTile = mTile.create(me);
@@ -965,7 +982,7 @@ public class Chunk { // SHOULD NOT CONTAIN ANY GENERATION CODE
 			}
 		}*/
 		
-		return true;
+		return e;
 	}
 	
 	public boolean attachSingleTile(Chunk chunk, int side, int alignment, int indexA, int indexB) {

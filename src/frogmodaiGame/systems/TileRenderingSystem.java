@@ -68,10 +68,11 @@ public class TileRenderingSystem extends IteratingSystem { // This is for terrai
 	@Override
 	protected void process(int e) { // this happens with high frequency
 
+		drewThisFrame = false;
+		
 		if (!fullRedraw)
 			return;
-
-		drewThisFrame = false;
+		
 		Position camPos = mPosition.create(e);
 		CameraWindow camWindow = mCameraWindow.create(e);
 		if (camWindow.focus == -1)

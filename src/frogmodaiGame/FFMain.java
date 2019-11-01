@@ -113,6 +113,7 @@ public class FFMain {
 	}*/
 	
 	public static void redraw() {
+		//System.out.println(worldManager.refreshNeeded());
 		if (worldManager.refreshNeeded())
 			try {
 				screen.refresh();
